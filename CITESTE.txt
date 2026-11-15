@@ -1,9 +1,7 @@
-Dominus V19.1 — corecție buton WhatsApp
+DOMINUS V19.2 - TEST PDF WhatsApp
 
-Corectată eroarea de sintaxă JavaScript din modulul WhatsApp în toate cele 6 formulare.
-Actualizat identificatorul cache din sw.js.
+Corectie: continutul formularului nu mai este randat in afara ecranului; verificare preventiva pentru PDF gol.
 
-TEST: publică în repository-ul separat dominus-v19-test, reîncarcă pagina în Chrome și testează butonul WhatsApp.
-PDF-ul este generat folosind html2pdf.js de pe CDN, deci necesită internet.
-Salvarea și distribuirea într-o singură apăsare nu sunt garantate pe orice Android.
-Nu șterge datele aplicației V18.
+TEST: incarca doar in dominus-v19-test; nu inlocui V18. Verifica PDF-ul in Descărcări inainte de trimitere.
+
+Atentie: salvarea si partajarea consecutive pot fi limitate de Android. Nu este garantat aspectul final al paginilor fara test pe telefon.

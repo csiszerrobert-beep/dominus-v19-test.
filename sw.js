@@ -1,5 +1,5 @@
 /* Dominus V19.1 — actualizare sigură a fișierelor, fără ștergerea datelor locale */
-const CACHE = 'dominus-v19-1-pdf-share-20261115-2';
+const CACHE = 'dominus-v19-2-pdf-visible-20261115';
 const ASSETS = [
   './', './index.html', './verificari.html', './constatare.html',
   './reclamatie.html', './pompe_pif.html', './certificat_garantie.html', './certificat_garantie_pompe.html',

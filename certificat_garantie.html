@@ -141,12 +141,19 @@ function prepare(){
 }
 async function makePdf(){
  await loadPdf();const root=prepare();
- root.style.position='fixed';root.style.left='-200vw';root.style.top='0';root.style.zIndex='-1';
+ root.style.position='absolute';root.style.left='0';root.style.top='0';root.style.zIndex='2147483647';root.style.background='#fff';
  document.body.appendChild(root);
  try{
   await Promise.all(Array.from(root.querySelectorAll('img')).map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r;setTimeout(r,2500)})));
   const opts={margin:[8,8,8,8],filename:safeName(),image:{type:'jpeg',quality:.88},html2canvas:{scale:1.6,useCORS:true,backgroundColor:'#ffffff',scrollY:0,windowWidth:900},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy'],avoid:['tr','figure']}};
-  const pdf=await window.html2pdf().set(opts).from(root).toPdf().get('pdf');
+  const worker=window.html2pdf().set(opts).from(root).toCanvas();
+  const canvas=await worker.get('canvas');
+  if(!canvas||canvas.width<100||canvas.height<100)throw new Error('Captura formularului nu a reușit');
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  let dark=0;const step=Math.max(1,Math.floor(Math.min(canvas.width,canvas.height)/70));
+  for(let y=0;y<canvas.height;y+=step){for(let x=0;x<canvas.width;x+=step){const d=ctx.getImageData(x,y,1,1).data;if(d[3]>0&&(d[0]<215||d[1]<215||d[2]<215))dark++;}}
+  if(dark<15)throw new Error('PDF-ul ar ieși gol. Generarea a fost oprită pentru a nu trimite un document gol.');
+  const pdf=await worker.toPdf().get('pdf');
   return new File([pdf.output('blob')],safeName(),{type:'application/pdf'});
  }finally{root.remove()}
 }
