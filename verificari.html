@@ -229,7 +229,7 @@ function libraries(){
  function load(src,check){return new Promise((resolve,reject)=>{if(check())return resolve();const el=document.createElement('script');el.src=src;el.onload=()=>check()?resolve():reject(new Error('Biblioteca nu a pornit'));el.onerror=()=>reject(new Error('Nu se poate încărca biblioteca. Verifică internetul.'));document.head.appendChild(el);});}
  loading=Promise.all([load('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',()=>!!window.html2canvas),load('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',()=>!!window.jspdf?.jsPDF)]).catch(e=>{loading=null;throw e});return loading;
 }
-function fileName(){const d=new Date().toISOString().slice(0,10);let name=prompt('Numele PDF-ului de test:',`Dominus_verificari_V19.7_${d}.pdf`);if(name===null)return null;name=name.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g,'_').replace(/\.+$/,'');return name?(name.toLowerCase().endsWith('.pdf')?name:name+'.pdf'):null;}
+function fileName(){const d=new Date().toISOString().slice(0,10);let name=prompt('Numele PDF-ului de test:',`Dominus_verificari_V19.8_${d}.pdf`);if(name===null)return null;name=name.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g,'_').replace(/\.+$/,'');return name?(name.toLowerCase().endsWith('.pdf')?name:name+'.pdf'):null;}
 function waitImages(root){return Promise.all(Array.from(root.querySelectorAll('img')).map(im=>im.complete?Promise.resolve():new Promise(r=>{im.addEventListener('load',r,{once:true});im.addEventListener('error',r,{once:true});setTimeout(r,5000)})));}
 async function renderDocument(){
  const iframe=document.createElement('iframe');iframe.setAttribute('aria-hidden','true');iframe.style.cssText='position:fixed;left:-12000px;top:0;width:794px;height:1123px;border:0;pointer-events:none;';document.body.appendChild(iframe);
@@ -247,16 +247,40 @@ async function renderDocument(){
   const srcInputs=document.querySelectorAll('input,textarea,select'), dstInputs=main.querySelectorAll('input,textarea,select');
   srcInputs.forEach((el,i)=>{const dst=dstInputs[i];if(!dst)return;if(el.matches('input[type=checkbox],input[type=radio]')){dst.checked=el.checked;el.checked?dst.setAttribute('checked',''):dst.removeAttribute('checked')}else if(el.tagName==='SELECT'){dst.value=el.value}else{dst.value=el.value;dst.setAttribute('value',el.value);if(dst.tagName==='TEXTAREA')dst.textContent=el.value}});
   const srcCanvases=document.querySelectorAll('canvas'),dstCanvases=main.querySelectorAll('canvas');srcCanvases.forEach((el,i)=>{try{const im=doc.createElement('img');im.src=el.toDataURL('image/png');im.style.cssText='display:block;width:100%;height:55px;object-fit:contain;border:1px solid #a6b9ce';dstCanvases[i]?.replaceWith(im)}catch(_){}});
+  // Render values as text, not native form widgets: html2canvas clips Android input glyphs.
+  for(const field of [...main.querySelectorAll('input:not([type=radio]):not([type=checkbox]),textarea')]){
+   const value=field.value||'';
+   const display=doc.createElement('div');display.className='dominus-v198-field';
+   display.textContent=value||'\u00a0';
+   field.replaceWith(display);
+  }
   // Image URLs may be blob: or data:, and can be loaded in the same-origin iframe.
   const srcPhotos=document.querySelector('#dominus-photo-pages');const dstPhotos=main.querySelector('#dominus-photo-pages');if(srcPhotos&&dstPhotos)dstPhotos.innerHTML=srcPhotos.innerHTML;
   const dstPrint=main.querySelector('#dominus-photo-print'),srcPrint=document.querySelector('#dominus-photo-print');if(dstPrint&&srcPrint)dstPrint.hidden=srcPrint.hidden;
-  const style=doc.createElement('style');style.textContent=`@page{size:A4;margin:10mm}html,body{width:794px!important;margin:0!important;background:white!important;color:#152e51!important}body{padding:0!important}.dominus-v196-print-root{width:794px!important;margin:0!important;padding:0 30px!important}.dominus-v196-print-root>.wrap{max-width:none!important}.dominus-v196-print-root header{display:block!important;background:white!important;color:#152e51!important}.dominus-v196-print-root .no-print,.dominus-v196-print-root .actions,.dominus-v196-print-root button,.dominus-v196-print-root .dominus-top-navigation,.dominus-v196-print-root .dominus-photo-item,.dominus-v196-print-root #dominus-photo-controls{display:none!important}#dominus-photo-print:not([hidden]){display:block!important}.dominus-photo-page{break-inside:avoid!important}.dominus-photo-page img{max-width:100%!important;max-height:950px!important;object-fit:contain!important}input,textarea,select{color:#000!important;opacity:1!important}canvas{max-width:100%}`;doc.head.appendChild(style);
+  const style=doc.createElement('style');style.textContent=`.dominus-v198-field{display:block!important;font:700 11px/1.25 Arial,sans-serif!important;min-height:17px!important;height:auto!important;padding:2px 4px!important;border:1px solid #cbd8e7!important;border-radius:7px!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;color:#111!important} .dominus-v196-print-root section{margin:5px 0!important;padding:6px 8px!important} .dominus-v196-print-root label{font-size:10px!important;margin:2px 0 1px!important} .dominus-v196-print-root h2{font-size:13px!important;margin:3px 0!important;padding:2px 0!important} .dominus-v196-print-root fieldset{padding:2px 0!important} .dominus-v196-print-root .checks label{font-size:9px!important;padding:2px 4px!important} .dominus-v196-print-root .grid{gap:3px 8px!important} .dominus-v196-print-root h3.group-heading{font-size:11px!important;margin:4px 0 2px!important;padding:3px!important}`@page{size:A4;margin:10mm}html,body{width:794px!important;margin:0!important;background:white!important;color:#152e51!important}body{padding:0!important}.dominus-v196-print-root{width:794px!important;margin:0!important;padding:0 30px!important}.dominus-v196-print-root>.wrap{max-width:none!important}.dominus-v196-print-root header{display:block!important;background:white!important;color:#152e51!important}.dominus-v196-print-root .no-print,.dominus-v196-print-root .actions,.dominus-v196-print-root button,.dominus-v196-print-root .dominus-top-navigation,.dominus-v196-print-root .dominus-photo-item,.dominus-v196-print-root #dominus-photo-controls{display:none!important}#dominus-photo-print:not([hidden]){display:block!important}.dominus-photo-page{break-inside:avoid!important}.dominus-photo-page img{max-width:100%!important;max-height:950px!important;object-fit:contain!important}input,textarea,select{color:#000!important;opacity:1!important}canvas{max-width:100%}`;doc.head.appendChild(style);
   await waitImages(main);await new Promise(r=>setTimeout(r,150));
+  const pageTwoHeading=[...main.querySelectorAll('h3')].find(e=>e.textContent.includes('Verificări generale'));
+  const splitCssY=pageTwoHeading ? pageTwoHeading.getBoundingClientRect().top-main.getBoundingClientRect().top : null;
   const canvas=await window.html2canvas(main,{backgroundColor:'#ffffff',scale:1.6,useCORS:true,allowTaint:false,logging:false,windowWidth:794,scrollX:0,scrollY:0});
-  if(canvas.width<500||canvas.height<300)throw new Error('Nu s-a putut reda formularul.');return canvas;
+  if(canvas.width<500||canvas.height<300)throw new Error('Nu s-a putut reda formularul.');return {canvas,splitY:splitCssY===null?null:Math.round(splitCssY*canvas.width/main.getBoundingClientRect().width)};
  }finally{iframe.remove()}
 }
-function pdfFromCanvas(canvas,name){const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});const w=210,h=297, pxPerPage=Math.floor(canvas.width*h/w);let y=0,page=0;while(y<canvas.height){const slice=document.createElement('canvas');slice.width=canvas.width;slice.height=Math.min(pxPerPage,canvas.height-y);slice.getContext('2d').drawImage(canvas,0,y,canvas.width,slice.height,0,0,canvas.width,slice.height);if(page++)pdf.addPage();pdf.addImage(slice.toDataURL('image/jpeg',0.88),'JPEG',0,0,w,slice.height*w/canvas.width);y+=slice.height;if(page>35)throw new Error('Prea multe pagini.');}const blob=pdf.output('blob');return new File([blob],name,{type:'application/pdf'});}
+function pdfFromCanvas(result,name){
+ const {canvas,splitY}=result;
+ const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});
+ const w=210,h=297,pxPerPage=Math.floor(canvas.width*h/w);
+ // Prefer the same second-page boundary as Chrome printing: "Verificări generale".
+ const cuts=[0];
+ if(splitY && splitY>canvas.width*.5 && splitY<canvas.height-150 && splitY<=pxPerPage*1.15)cuts.push(Math.min(canvas.height,splitY));
+ let y=cuts[cuts.length-1];while(y<canvas.height){y=Math.min(canvas.height,y+pxPerPage);cuts.push(y);if(cuts.length>36)throw new Error('Prea multe pagini.')}
+ for(let p=0;p<cuts.length-1;p++){
+  const top=cuts[p],height=cuts[p+1]-top;
+  const slice=document.createElement('canvas');slice.width=canvas.width;slice.height=height;
+  slice.getContext('2d').drawImage(canvas,0,top,canvas.width,height,0,0,canvas.width,height);
+  if(p)pdf.addPage();pdf.addImage(slice.toDataURL('image/jpeg',0.9),'JPEG',0,0,w,height*w/canvas.width);
+ }
+ return new File([pdf.output('blob')],name,{type:'application/pdf'});
+}
 function download(file){const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 
 let preparedFile=null;
@@ -292,8 +316,8 @@ window.dominusWhatsApp=async function(){
   const file=pdfFromCanvas(canvas,name);
   showReady(file);
  }catch(e){
-  console.error('Dominus V19.7:',e);
-  alert('Testul V19.7 nu a reușit: '+e.message+'\nFolosește PDF / Imprimă pentru documentul original.');
+  console.error('Dominus V19.8:',e);
+  alert('Testul V19.8 nu a reușit: '+e.message+'\nFolosește PDF / Imprimă pentru documentul original.');
  }finally{busy=false;if(button){button.disabled=false;button.textContent=old}}
 };
 
