@@ -191,32 +191,51 @@ function prepare(){
  root.appendChild(clone);return root;
 }
 async function makePdf(name){
- // Captură a formularului, apoi pagini PDF create explicit din imagine.
- // Nu mai folosim worker.toPdf(), care a produs documente goale în V19.1/V19.2.
- const jsPDF=await loadJsPdf();await loadPdf();const root=prepare();
- root.style.position='absolute';root.style.left='0';root.style.top='0';root.style.zIndex='2147483647';root.style.background='#fff';
+ // Randare pe sectiuni: evita o singura captura foarte inalta pe Android.
+ const jsPDF=await loadJsPdf();await loadPdf();
+ const root=prepare();
+ root.style.cssText+=';position:fixed;left:0;top:0;z-index:2147483647;width:720px;max-width:none;visibility:visible;';
  document.body.appendChild(root);
+ const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
+ const pageW=194,pageH=281;
+ let page=0,printed=0;
  try{
-  await Promise.all(Array.from(root.querySelectorAll('img')).map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r;setTimeout(r,2500)})));
-  const worker=window.html2pdf().set({html2canvas:{scale:1.5,useCORS:true,backgroundColor:'#ffffff',scrollY:0,windowWidth:900}}).from(root).toCanvas();
-  const canvas=await worker.get('canvas');
-  if(!canvas||canvas.width<100||canvas.height<100)throw new Error('Nu s-a putut captura formularul.');
-  const ctx=canvas.getContext('2d',{willReadFrequently:true});let dark=0;
-  const step=Math.max(2,Math.floor(Math.min(canvas.width,canvas.height)/60));
-  for(let y=0;y<canvas.height;y+=step)for(let x=0;x<canvas.width;x+=step){const v=ctx.getImageData(x,y,1,1).data;if(v[3]&&Math.min(v[0],v[1],v[2])<195)dark++}
-  if(dark<20)throw new Error('Captura este albă; PDF-ul nu a fost trimis.');
-  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
-  const pageW=194,pageH=281,ratio=canvas.width/pageW;
-  const sliceH=Math.floor(pageH*ratio);let page=0;
-  for(let top=0;top<canvas.height;top+=sliceH){
-   const height=Math.min(sliceH,canvas.height-top);
-   const part=document.createElement('canvas');part.width=canvas.width;part.height=height;
-   part.getContext('2d').drawImage(canvas,0,top,canvas.width,height,0,0,canvas.width,height);
-   const data=part.toDataURL('image/jpeg',0.86);
-   if(page++)pdf.addPage();pdf.addImage(data,'JPEG',8,8,pageW,height/ratio,'','FAST');
+  const source=root.firstElementChild||root;
+  // Blocurile de nivel superior sunt randate separat pentru a limita memoria.
+  let blocks=Array.from(source.children).filter(el=>!el.matches('script,style,nav,.no-print,.dominus-v17-bar'));
+  if(blocks.length<2){
+   const sections=Array.from(source.querySelectorAll('section'));
+   if(sections.length)blocks=sections;
+  }
+  if(!blocks.length)blocks=[source];
+  const canvasMaker=window.html2canvas;
+  if(typeof canvasMaker!=='function')throw new Error('Biblioteca de capturare nu este disponibila.');
+  for(const block of blocks){
+   if(!block.isConnected)continue;
+   const box=block.getBoundingClientRect();
+   if(box.height<2||box.width<2)continue;
+   // Pentru blocuri lungi, capturam in fasii de cel mult 1100 px.
+   const total=Math.ceil(box.height);
+   for(let y=0;y<total;y+=1050){
+    const h=Math.min(1050,total-y);
+    const cv=await canvasMaker(block,{scale:1,useCORS:true,backgroundColor:'#ffffff',logging:false,
+     width:Math.ceil(box.width),height:h,y:y,scrollY:0,windowWidth:900,
+     onclone:(doc)=>{const r=doc.querySelector('.dominus-v19-pdf-root');if(r){r.style.position='absolute';r.style.left='0';r.style.top='0';}}});
+    if(!cv||cv.width<50||cv.height<10)continue;
+    const ratio=cv.width/pageW;
+    const maxSlice=Math.floor(pageH*ratio);
+    for(let top=0;top<cv.height;top+=maxSlice){
+     const hh=Math.min(maxSlice,cv.height-top);
+     const part=document.createElement('canvas');part.width=cv.width;part.height=hh;
+     part.getContext('2d').drawImage(cv,0,top,cv.width,hh,0,0,cv.width,hh);
+     if(page++)pdf.addPage();
+     pdf.addImage(part.toDataURL('image/jpeg',0.85),'JPEG',8,8,pageW,hh/ratio,'','FAST');
+     printed++;
+    }
+   }
   }
   const blob=pdf.output('blob');
-  if(blob.size<10000)throw new Error('PDF prea mic: verificarea a oprit trimiterea unui document posibil gol.');
+  if(!printed||blob.size<10000)throw new Error('PDF incomplet; trimiterea a fost oprita.');
   return new File([blob],name,{type:'application/pdf'});
  }finally{root.remove()}
 }
