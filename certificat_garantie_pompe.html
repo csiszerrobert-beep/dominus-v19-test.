@@ -40,130 +40,130 @@ if(saved.signature){let im=new Image();im.onload=()=>ctx.drawImage(im,0,0,c.widt
 function clearSignature(){ctx.clearRect(0,0,c.width,c.height);delete saved.signature;persist();update()}
 function clearData(){if(!confirm('Ștergi toate datele acestui certificat?'))return;localStorage.removeItem(key);location.reload()}
 update();
-</script><nav class="dominus-bottom-nav" aria-label="Navigare formular"><button type="button" class="dominus-print-bottom" onclick="window.print()">🖨️ Imprimă / Salvează PDF</button><button type="button" id="dominus-go-top">↑ Sus</button><a href="index.html" id="dominus-back-menu">← Înapoi la meniu</a></nav><script id="dominus-bottom-nav-script">(function(){var back=document.getElementById('dominus-back-menu');back.addEventListener('click',function(){if(typeof window.save==='function'){try{window.save()}catch(e){}}});document.getElementById('dominus-go-top').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})})();</script><nav class="dominus-v17-bar no-print" aria-label="Acțiuni rapide"><button type="button" onclick="dominusV17Save()">💾 Salvare</button><button type="button" onclick="dominusV17Print()">🖨️ PDF</button><button type="button" onclick="dominusV17Email()">✉️ E-mail</button><button type="button" class="wa" onclick="dominusWhatsApp()">🟢 WhatsApp</button><button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Sus</button><a href="index.html">← Meniu</a></nav><script id="dominus-v17-adapter">window.dominusV17Save=function(){try{if(typeof save==='function')return save();if(typeof saveData==='function')return saveData();if(typeof saveAll==='function')return saveAll();}catch(e){alert('Salvarea nu a reușit.');return;}alert('Datele acestui certificat sunt păstrate automat în browser, dacă este activată salvarea locală.');};window.dominusV17Print=function(){try{if(typeof save==='function')save();}catch(e){}window.print()};window.dominusV17Email=function(){if(typeof sendEmail==='function')return sendEmail();if(typeof email==='function')return email();alert('Salvează PDF-ul și atașează-l într-un e-mail.');};</script><script id="dominus-v19-pdf-share">
+</script><nav class="dominus-bottom-nav" aria-label="Navigare formular"><button type="button" class="dominus-print-bottom" onclick="window.print()">🖨️ Imprimă / Salvează PDF</button><button type="button" id="dominus-go-top">↑ Sus</button><a href="index.html" id="dominus-back-menu">← Înapoi la meniu</a></nav><script id="dominus-bottom-nav-script">(function(){var back=document.getElementById('dominus-back-menu');back.addEventListener('click',function(){if(typeof window.save==='function'){try{window.save()}catch(e){}}});document.getElementById('dominus-go-top').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})})();</script><nav class="dominus-v17-bar no-print" aria-label="Acțiuni rapide"><button type="button" onclick="dominusV17Save()">💾 Salvare</button><button type="button" onclick="dominusV17Print()">🖨️ PDF</button><button type="button" onclick="dominusV17Email()">✉️ E-mail</button><button type="button" class="wa" onclick="dominusWhatsApp()">🟢 WhatsApp</button><button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Sus</button><a href="index.html">← Meniu</a></nav><script id="dominus-v17-adapter">window.dominusV17Save=function(){try{if(typeof save==='function')return save();if(typeof saveData==='function')return saveData();if(typeof saveAll==='function')return saveAll();}catch(e){alert('Salvarea nu a reușit.');return;}alert('Datele acestui certificat sunt păstrate automat în browser, dacă este activată salvarea locală.');};window.dominusV17Print=function(){try{if(typeof save==='function')save();}catch(e){}window.print()};window.dominusV17Email=function(){if(typeof sendEmail==='function')return sendEmail();if(typeof email==='function')return email();alert('Salvează PDF-ul și atașează-l într-un e-mail.');};</script><script id="dominus-v195-direct-pdf">
 (function(){
 'use strict';
-let busy=false,loader=null;
-const LIB='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-function notify(msg){alert(msg)}
+let busy=false, pdfLoader=null;
 function loadPdf(){
- if(window.html2pdf)return Promise.resolve();
- if(loader)return loader;
- loader=new Promise((resolve,reject)=>{
-  const s=document.createElement('script');s.src=LIB;s.async=true;
-  s.onload=()=>window.html2pdf?resolve():reject(new Error('Biblioteca PDF nu este disponibilă'));
-  s.onerror=()=>reject(new Error('Biblioteca PDF nu s-a putut încărca. Este necesară conexiunea la internet.'));
-  document.head.appendChild(s);
- }).catch(e=>{loader=null;throw e});return loader;
-}
-function safeName(){
- const page=location.pathname.split('/').pop().replace(/\.html$/,'')||'formular';
- const d=new Date();return 'Dominus_'+page+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.pdf';
-}
-function chooseName(){
- const original=safeName();const answer=prompt('Numele PDF-ului pentru salvare și WhatsApp:',original);
- if(answer===null)return null;
- let name=answer.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g,'_').replace(/\.+$/,'');
- if(!name)return null;
- if(!/\.pdf$/i.test(name))name+='.pdf';return name;
-}
-let jsPdfPromise;
-function loadJsPdf(){
  if(window.jspdf&&window.jspdf.jsPDF)return Promise.resolve(window.jspdf.jsPDF);
- if(jsPdfPromise)return jsPdfPromise;
- jsPdfPromise=new Promise((resolve,reject)=>{
-  const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-  script.onload=()=>window.jspdf&&window.jspdf.jsPDF?resolve(window.jspdf.jsPDF):reject(new Error('Biblioteca jsPDF nu este disponibilă'));
-  script.onerror=()=>reject(new Error('Nu s-a putut încărca jsPDF. Verifică internetul.'));
-  document.head.appendChild(script);
- }).catch(e=>{jsPdfPromise=null;throw e});return jsPdfPromise;
+ if(pdfLoader)return pdfLoader;
+ pdfLoader=new Promise((resolve,reject)=>{
+  const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  s.onload=()=>window.jspdf&&window.jspdf.jsPDF?resolve(window.jspdf.jsPDF):reject(new Error('Biblioteca jsPDF nu s-a incarcat. Verifica internetul.'));
+  s.onerror=()=>reject(new Error('Biblioteca jsPDF nu este accesibila. Verifica internetul.'));
+  document.head.appendChild(s);
+ }).catch(e=>{pdfLoader=null;throw e});return pdfLoader;
 }
-function prepare(){
- try{if(typeof window.save==='function')window.save();else if(typeof window.saveData==='function')window.saveData()}catch(_){}
- window.dispatchEvent(new Event('beforeprint'));
- const root=document.createElement('div');root.className='dominus-v19-pdf-root';
- root.style.cssText='width:190mm;box-sizing:border-box;background:#fff;color:#111;padding:0;margin:0 auto;font-size:11px;';
- const source=document.querySelector('main')||document.querySelector('#form')||document.body;
- const clone=source.cloneNode(true);
- const originals=source.querySelectorAll('input,textarea,select');
- const copies=clone.querySelectorAll('input,textarea,select');
- originals.forEach((el,i)=>{const dest=copies[i];if(!dest)return;
-  if(el.tagName==='TEXTAREA'){dest.value=el.value;dest.textContent=el.value}
-  else if(el.tagName==='SELECT'){dest.value=el.value;Array.from(dest.options).forEach(o=>o.selected=o.value===el.value)}
-  else if(el.type==='checkbox'||el.type==='radio'){dest.checked=el.checked;if(el.checked)dest.setAttribute('checked','');else dest.removeAttribute('checked')}
-  else {dest.value=el.value;dest.setAttribute('value',el.value)}
- });
- const a=source.querySelectorAll('canvas'),b=clone.querySelectorAll('canvas');
- a.forEach((c,i)=>{try{const img=document.createElement('img');img.src=c.toDataURL('image/png');img.style.cssText='width:'+c.offsetWidth+'px;max-width:100%;height:auto;';b[i].replaceWith(img)}catch(_){}});
- clone.querySelectorAll('button,.no-print,.dominus-bottom-actions,.dominus-v17-bar,.dominus-bottom-nav,.dominus-top-navigation,nav,script,input[type=file]').forEach(el=>el.remove());
- clone.querySelectorAll('[hidden]').forEach(el=>el.remove());
- clone.querySelectorAll('img').forEach(img=>{img.loading='eager';img.style.maxWidth='100%'});
- root.appendChild(clone);return root;
+function ascii(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\u0000-\u001f]/g,' ').replace(/[^\x20-\x7e\n]/g,'-').trim()}
+function chooseName(){
+ const d=new Date(),date=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+ const base=(location.pathname.split('/').pop()||'formular').replace(/\.html$/,'');
+ const input=prompt('Numele PDF-ului pentru salvare si WhatsApp:',`Dominus_${base}_${date}.pdf`);
+ if(input===null)return null;
+ let name=input.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g,'_').replace(/\.+$/,'');
+ if(!name)return null;
+ return /\.pdf$/i.test(name)?name:name+'.pdf';
 }
+function getLabel(el){
+ const id=el.id;
+ let label=id?document.querySelector('label[for="'+CSS.escape(id)+'"]'):null;
+ if(!label)label=el.closest('label');
+ if(label)return ascii(label.textContent.replace(/\s+/g,' ')).slice(0,110);
+ const parent=el.parentElement;
+ if(parent){let text=Array.from(parent.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join(' ').trim();if(text)return ascii(text).slice(0,110)}
+ return ascii(el.getAttribute('placeholder')||el.getAttribute('aria-label')||el.name||el.id||'Camp');
+}
+function inputValue(el){
+ if(el.type==='file'||el.type==='button'||el.type==='submit'||el.type==='hidden')return null;
+ if(el.type==='checkbox'||el.type==='radio')return el.checked?'Bifat':null;
+ if(el.tagName==='SELECT')return el.options[el.selectedIndex]?.text||'';
+ return el.value||'';
+}
+function sectionTitle(el){return ascii(el.querySelector('h1,h2,h3,legend')?.textContent||el.getAttribute('aria-label')||'').slice(0,150)}
+function visible(el){return !el.closest('.no-print,.dominus-v17-bar,.dominus-bottom-nav,.dominus-top-navigation,.dominus-photo-button,.dominus-photo-controls') && !el.disabled}
 async function makePdf(name){
- // Randare pe sectiuni: evita o singura captura foarte inalta pe Android.
- const jsPDF=await loadJsPdf();await loadPdf();
- const root=prepare();
- root.style.cssText+=';position:fixed;left:0;top:0;z-index:2147483647;width:720px;max-width:none;visibility:visible;';
- document.body.appendChild(root);
- const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
- const pageW=194,pageH=281;
- let page=0,printed=0;
- try{
-  const source=root.firstElementChild||root;
-  // Blocurile de nivel superior sunt randate separat pentru a limita memoria.
-  let blocks=Array.from(source.children).filter(el=>!el.matches('script,style,nav,.no-print,.dominus-v17-bar'));
-  if(blocks.length<2){
-   const sections=Array.from(source.querySelectorAll('section'));
-   if(sections.length)blocks=sections;
+ const JsPDF=await loadPdf();
+ const pdf=new JsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});
+ const margin=13,W=184, maxY=281;
+ let y=18, page=1, entries=0;
+ function newPage(){pdf.addPage();page++;y=18;pdf.setFont('helvetica','normal');pdf.setFontSize(9)}
+ function lines(text,size=9,bold=false,indent=0){
+  text=ascii(text);if(!text)return;
+  pdf.setFont('helvetica',bold?'bold':'normal');pdf.setFontSize(size);
+  const wrapped=pdf.splitTextToSize(text,W-indent);
+  for(const line of wrapped){if(y>maxY)newPage();pdf.text(line,margin+indent,y);y+=size*0.43+1.25}
+  entries++;
+ }
+ function heading(text){if(y>maxY-17)newPage();y+=3;pdf.setDrawColor(190);pdf.line(margin,y-3,margin+W,y-3);lines(text,11,true)}
+ const title=ascii(document.title||'Document Dominus');
+ lines('DOMINUS',17,true);lines(title,12,true);lines('Data generarii: '+new Date().toLocaleString('ro-RO'),8);y+=3;
+ const root=document.querySelector('main')||document.querySelector('#form')||document.body;
+ const sections=Array.from(root.querySelectorAll('section,fieldset'));
+ const roots=sections.length?sections:[root];
+ const used=new Set();
+ for(const section of roots){
+  if(!visible(section))continue;
+  const title=sectionTitle(section);if(title)heading(title);
+  for(const el of section.querySelectorAll('input,textarea,select')){
+   if(used.has(el)||!visible(el))continue;used.add(el);
+   const value=inputValue(el);if(value===null||!String(value).trim())continue;
+   const label=getLabel(el);
+   lines((label?label+': ':'')+String(value),9,false,2);
   }
-  if(!blocks.length)blocks=[source];
-  const canvasMaker=window.html2canvas;
-  if(typeof canvasMaker!=='function')throw new Error('Biblioteca de capturare nu este disponibila.');
-  for(const block of blocks){
-   if(!block.isConnected)continue;
-   const box=block.getBoundingClientRect();
-   if(box.height<2||box.width<2)continue;
-   // Pentru blocuri lungi, capturam in fasii de cel mult 1100 px.
-   const total=Math.ceil(box.height);
-   for(let y=0;y<total;y+=1050){
-    const h=Math.min(1050,total-y);
-    const cv=await canvasMaker(block,{scale:1,useCORS:true,backgroundColor:'#ffffff',logging:false,
-     width:Math.ceil(box.width),height:h,y:y,scrollY:0,windowWidth:900,
-     onclone:(doc)=>{const r=doc.querySelector('.dominus-v19-pdf-root');if(r){r.style.position='absolute';r.style.left='0';r.style.top='0';}}});
-    if(!cv||cv.width<50||cv.height<10)continue;
-    const ratio=cv.width/pageW;
-    const maxSlice=Math.floor(pageH*ratio);
-    for(let top=0;top<cv.height;top+=maxSlice){
-     const hh=Math.min(maxSlice,cv.height-top);
-     const part=document.createElement('canvas');part.width=cv.width;part.height=hh;
-     part.getContext('2d').drawImage(cv,0,top,cv.width,hh,0,0,cv.width,hh);
-     if(page++)pdf.addPage();
-     pdf.addImage(part.toDataURL('image/jpeg',0.85),'JPEG',8,8,pageW,hh/ratio,'','FAST');
-     printed++;
-    }
-   }
+  // Include textul informativ pentru certificate si declaratii.
+  if(!section.querySelector('input,textarea,select')){
+   const prose=Array.from(section.querySelectorAll('p,li')).map(n=>ascii(n.textContent)).filter(Boolean);
+   prose.slice(0,70).forEach(t=>lines(t,8));
   }
-  const blob=pdf.output('blob');
-  if(!printed||blob.size<10000)throw new Error('PDF incomplet; trimiterea a fost oprita.');
-  return new File([blob],name,{type:'application/pdf'});
- }finally{root.remove()}
+ }
+ // Campuri din afara sectiunilor.
+ for(const el of root.querySelectorAll('input,textarea,select')){
+  if(used.has(el)||!visible(el))continue;used.add(el);
+  const val=inputValue(el);if(val!==null&&String(val).trim())lines(getLabel(el)+': '+val,9);
+ }
+ // Semnaturi desenate pe canvas.
+ const canvases=Array.from(root.querySelectorAll('canvas')).filter(visible);
+ for(let i=0;i<canvases.length;i++){
+  const canvas=canvases[i];try{
+   if(!canvas.width||!canvas.height)continue;
+   const ctx=canvas.getContext('2d');const pix=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+   let ink=false;for(let j=0;j<pix.length;j+=16){if(pix[j+3]>30 && (pix[j]<235||pix[j+1]<235||pix[j+2]<235)){ink=true;break}}
+   if(!ink)continue;
+   if(y>maxY-35)newPage();lines('Semnatura '+(i+1),9,true);const h=Math.min(29,canvas.height/canvas.width*95);
+   pdf.addImage(canvas.toDataURL('image/png'),'PNG',margin,y,95,h);y+=h+5;entries++;
+  }catch(e){console.warn('Semnatura omisa',e)}
+ }
+ // Fotografii anexate (data URL, sau imagini deja incarcate).
+ const photos=Array.from(root.querySelectorAll('#dominus-photo-print img,.dominus-photo-page img,.dominus-photo-item img')).filter((im,i,a)=>a.findIndex(x=>x.src===im.src)===i);
+ for(let i=0;i<photos.length;i++){
+  const im=photos[i];try{
+   if(!im.complete||!im.naturalWidth)continue;
+   const cv=document.createElement('canvas');const scale=Math.min(1,1000/im.naturalWidth);
+   cv.width=Math.max(1,Math.round(im.naturalWidth*scale));cv.height=Math.max(1,Math.round(im.naturalHeight*scale));
+   cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
+   const h=Math.min(220,cv.height/cv.width*W);
+   newPage();lines('Fotografie anexata '+(i+1),10,true);
+   pdf.addImage(cv.toDataURL('image/jpeg',0.75),'JPEG',margin,y,W,h);y+=h+4;entries++;
+  }catch(e){console.warn('Fotografie omisa',e)}
+ }
+ if(entries<3)throw new Error('Nu au fost gasite suficiente date in formular. Completeaza formularul si incearca din nou.');
+ for(let i=1;i<=page;i++){pdf.setPage(i);pdf.setFontSize(8);pdf.setTextColor(100);pdf.text('Dominus - pagina '+i+' / '+page,margin,291);pdf.setTextColor(0)}
+ const blob=pdf.output('blob');if(blob.size<2000)throw new Error('PDF-ul generat este prea mic.');
+ return new File([blob],name,{type:'application/pdf'});
 }
-function download(file){const url=URL.createObjectURL(file);const a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
+function download(file){const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 window.dominusWhatsApp=async function(){
- if(busy)return;busy=true;
- const button=document.querySelector('.dominus-v17-bar .wa');const old=button&&button.textContent;
- if(button){button.disabled=true;button.textContent='⏳ PDF...'}
+ if(busy)return;
+ const name=chooseName();if(!name)return;
+ busy=true;const button=document.querySelector('.dominus-v17-bar .wa'),old=button?.textContent;
+ if(button){button.disabled=true;button.textContent='PDF...'}
  try{
-  const name=chooseName();if(!name)return;
-  const file=await makePdf(name);
-  // Descărcare explicită, astfel încât să existe și o copie reutilizabilă.
-  download(file);
+  const file=await makePdf(name);download(file);
   if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
    try{await navigator.share({files:[file],title:'Document Dominus'});}
-   catch(e){if(e.name!=='AbortError')notify('PDF-ul a fost descărcat. Distribuirea automată nu a reușit; îl poți trimite din Descărcări.');}
-  }else notify('PDF-ul a fost descărcat. Pentru WhatsApp, deschide Descărcări și distribuie fișierul.');
- }catch(e){console.error('Dominus V19 PDF:',e);notify('Nu am putut genera PDF-ul pentru WhatsApp: '+e.message+'\nPoți folosi în continuare butonul PDF / Imprimă.');}
+   catch(e){if(e.name!=='AbortError')alert('PDF-ul a fost descarcat. Distribuie-l din Descarcari.');}
+  }else alert('PDF-ul a fost descarcat. Deschide Descarcari pentru a-l trimite prin WhatsApp.');
+ }catch(e){console.error('Dominus PDF direct:',e);alert('Generarea PDF a esuat: '+e.message+'\nFoloseste butonul PDF / Imprima pentru documentul original.');}
  finally{busy=false;if(button){button.disabled=false;button.textContent=old}}
 };
 })();
