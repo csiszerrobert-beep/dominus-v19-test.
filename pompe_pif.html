@@ -210,25 +210,42 @@ async function renderDocument(){
   const dstPrint=main.querySelector('#dominus-photo-print'),srcPrint=document.querySelector('#dominus-photo-print');if(dstPrint&&srcPrint)dstPrint.hidden=srcPrint.hidden;
   const style=doc.createElement('style');style.textContent=`.dominus-v198-field{display:block!important;font:700 12px/1.25 Arial,sans-serif!important;min-height:20px!important;height:auto!important;padding:2px 4px!important;border:1px solid #cbd8e7!important;border-radius:7px!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;color:#111!important} .dominus-v196-print-root section{margin:9px 0!important;padding:12px 14px!important} .dominus-v196-print-root label{font-size:11px!important;margin:2px 0 3px!important} .dominus-v196-print-root h2{font-size:16px!important;margin:3px 0 9px!important;padding:2px 0 6px!important} .dominus-v196-print-root fieldset{padding:2px 0!important} .dominus-v196-print-root .checks label{font-size:9px!important;padding:2px 4px!important} .dominus-v196-print-root .grid{gap:8px 12px!important} .dominus-v196-print-root h3.group-heading{font-size:11px!important;margin:4px 0 2px!important;padding:3px!important}@page{size:A4;margin:10mm}html,body{width:794px!important;margin:0!important;background:white!important;color:#152e51!important}body{padding:0!important}.dominus-v196-print-root{width:794px!important;margin:0!important;padding:0 49px!important}.dominus-v196-print-root>.wrap{max-width:none!important}.dominus-v196-print-root header{display:none!important}.dominus-v196-print-root .muted,.dominus-v196-print-root .no-print,.dominus-v196-print-root .actions,.dominus-v196-print-root button,.dominus-v196-print-root .dominus-top-navigation,.dominus-v196-print-root .dominus-photo-item,.dominus-v196-print-root #dominus-photo-controls{display:none!important}#dominus-photo-print:not([hidden]){display:block!important}.dominus-photo-page{break-inside:avoid!important}.dominus-photo-page img{max-width:100%!important;max-height:950px!important;object-fit:contain!important}input,textarea,select{color:#000!important;opacity:1!important}canvas{max-width:100%}`;doc.head.appendChild(style);
   await waitImages(main);await new Promise(r=>setTimeout(r,150));
-  const pageTwoHeading=[...main.querySelectorAll('h3')].find(e=>e.textContent.includes('Verificări generale'));
-  const splitCssY=pageTwoHeading ? pageTwoHeading.getBoundingClientRect().top-main.getBoundingClientRect().top : null;
+  // DOMINUS V19.13: Capture semantic page/section boundaries before rasterizing.
+  // Never use a heading from another form (the old 'Verificări generale' rule).
+  const rootRect=main.getBoundingClientRect();
+  const boundarySelectors=main.querySelector('.page') ? '.page' : 'section';
+  const boundaries=[...main.querySelectorAll(boundarySelectors)]
+   .filter(el=>{const r=el.getBoundingClientRect();return r.height>0 && r.width>0})
+   .map(el=>Math.max(0,el.getBoundingClientRect().top-rootRect.top));
   const canvas=await window.html2canvas(main,{backgroundColor:'#ffffff',scale:1.6,useCORS:true,allowTaint:false,logging:false,windowWidth:794,scrollX:0,scrollY:0});
-  if(canvas.width<500||canvas.height<300)throw new Error('Nu s-a putut reda formularul.');return {canvas,splitY:splitCssY===null?null:Math.round(splitCssY*canvas.width/main.getBoundingClientRect().width)};
+  if(canvas.width<500||canvas.height<300)throw new Error('Nu s-a putut reda formularul.');return {canvas,boundaries:boundaries.map(y=>Math.round(y*canvas.width/main.getBoundingClientRect().width))};
  }finally{iframe.remove()}
 }
 function pdfFromCanvas(result,name){
- const {canvas,splitY}=result;
+ const {canvas,boundaries=[]}=result;
  const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});
- const w=210,h=297,pxPerPage=Math.floor(canvas.width*h/w);
- // Prefer the same second-page boundary as Chrome printing: "Verificări generale".
- const cuts=[0];
- if(splitY && splitY>canvas.width*.5 && splitY<canvas.height-150 && splitY<=pxPerPage*1.15)cuts.push(Math.min(canvas.height,splitY));
- let y=cuts[cuts.length-1];while(y<canvas.height){y=Math.min(canvas.height,y+pxPerPage);cuts.push(y);if(cuts.length>36)throw new Error('Prea multe pagini.')}
+ // 10 mm printable margins, matching the @page print setting.
+ const margin=10,w=190,h=277,pxPerPage=Math.floor(canvas.width*h/w);
+ const safe=[...new Set(boundaries.filter(y=>y>0&&y<canvas.height).map(Math.round))].sort((a,b)=>a-b);
+ const cuts=[0];let top=0;
+ while(top<canvas.height){
+  const limit=Math.min(canvas.height,top+pxPerPage);
+  let bottom=limit;
+  if(limit<canvas.height){
+   // Prefer a section/page boundary, provided it does not create a nearly empty page.
+   const candidates=safe.filter(y=>y>top+pxPerPage*.48&&y<=limit);
+   if(candidates.length)bottom=candidates[candidates.length-1];
+  }
+  if(bottom<=top)throw new Error('Eroare de paginare PDF.');
+  cuts.push(bottom);top=bottom;
+  if(cuts.length>45)throw new Error('Prea multe pagini.');
+ }
  for(let p=0;p<cuts.length-1;p++){
   const top=cuts[p],height=cuts[p+1]-top;
   const slice=document.createElement('canvas');slice.width=canvas.width;slice.height=height;
   slice.getContext('2d').drawImage(canvas,0,top,canvas.width,height,0,0,canvas.width,height);
-  if(p)pdf.addPage();pdf.addImage(slice.toDataURL('image/jpeg',0.9),'JPEG',0,0,w,height*w/canvas.width);
+  if(p)pdf.addPage();
+  pdf.addImage(slice.toDataURL('image/jpeg',0.92),'JPEG',margin,margin,w,height*w/canvas.width);
  }
  return new File([pdf.output('blob')],name,{type:'application/pdf'});
 }
