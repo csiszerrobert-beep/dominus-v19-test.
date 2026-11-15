@@ -1,0 +1,7 @@
+Dominus V19 — versiune de test pentru Android.
+
+Butonul WhatsApp încearcă să genereze PDF, să îl descarce în telefon și să deschidă distribuirea Android cu PDF-ul atașat. Selectează WhatsApp din meniul de distribuire.
+
+ATENȚIE: biblioteca html2pdf se încarcă de pe cdnjs.cloudflare.com și necesită conexiune la internet. Aspectul PDF-ului generat prin WhatsApp poate diferi de PDF / Imprimă. Dacă biblioteca nu se încarcă, butonul PDF / Imprimă rămâne disponibil. Browserul poate bloca distribuirea automată după generare; PDF-ul descărcat poate fi distribuit manual. Verifică efectiv fișierul în Descărcări înainte să consideri că este salvat.
+
+Testați local pe telefon înainte de înlocuirea versiunii publicate. Nu ștergeți datele aplicației.
