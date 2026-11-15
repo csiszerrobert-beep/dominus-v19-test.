@@ -197,8 +197,7 @@ window.dominusWhatsApp=async function(){
    try{await navigator.share({files:[file],title:'Document Dominus'});}
    catch(e){if(e.name!=='AbortError')notify('PDF-ul a fost descărcat. Distribuirea automată nu a reușit; îl poți trimite din Descărcări.');}
   }else notify('PDF-ul a fost descărcat. Pentru WhatsApp, deschide Descărcări și distribuie fișierul.');
- }catch(e){console.error('Dominus V19 PDF:',e);notify('Nu am putut genera PDF-ul pentru WhatsApp: '+e.message+'
-Poți folosi în continuare butonul PDF / Imprimă.');}
+ }catch(e){console.error('Dominus V19 PDF:',e);notify('Nu am putut genera PDF-ul pentru WhatsApp: '+e.message+'\nPoți folosi în continuare butonul PDF / Imprimă.');}
  finally{busy=false;if(button){button.disabled=false;button.textContent=old}}
 };
 })();
