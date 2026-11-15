@@ -67,6 +67,17 @@ async function renderDocument(){
   const srcInputs=document.querySelectorAll('input,textarea,select'), dstInputs=main.querySelectorAll('input,textarea,select');
   srcInputs.forEach((el,i)=>{const dst=dstInputs[i];if(!dst)return;if(el.matches('input[type=checkbox],input[type=radio]')){dst.checked=el.checked;el.checked?dst.setAttribute('checked',''):dst.removeAttribute('checked')}else if(el.tagName==='SELECT'){dst.value=el.value}else{dst.value=el.value;dst.setAttribute('value',el.value);if(dst.tagName==='TEXTAREA')dst.textContent=el.value}});
   const srcCanvases=document.querySelectorAll('canvas'),dstCanvases=main.querySelectorAll('canvas');srcCanvases.forEach((el,i)=>{try{const im=doc.createElement('img');im.src=el.toDataURL('image/png');im.style.cssText='display:block;width:100%;height:55px;object-fit:contain;border:1px solid #a6b9ce';dstCanvases[i]?.replaceWith(im)}catch(_){}});
+  // V19.15: Convert radio/checkbox controls into explicit PDF markers.
+  // html2canvas on Android does not reliably paint native checked controls.
+  // Use the ORIGINAL control state, copied above, and retain DA/NU labels.
+  for(const control of [...main.querySelectorAll('input[type="radio"],input[type="checkbox"]')]){
+   const marker=doc.createElement('span');
+   marker.className='dominus-v1915-choice-marker';
+   marker.textContent=control.checked?'◉':'○';
+   marker.style.cssText='display:inline-block!important;vertical-align:middle!important;min-width:15px!important;margin-right:4px!important;color:#172f4c!important;font:700 15px/1 Arial,sans-serif!important;white-space:nowrap!important';
+   marker.setAttribute('aria-label',control.checked?'Selectat':'Neselectat');
+   control.replaceWith(marker);
+  }
   // Render values as text, not native form widgets: html2canvas clips Android input glyphs.
   for(const field of [...main.querySelectorAll('input:not([type=radio]):not([type=checkbox]),textarea')]){
    const value=field.value||'';
@@ -75,7 +86,10 @@ async function renderDocument(){
    field.replaceWith(display);
   }
   // Image URLs may be blob: or data:, and can be loaded in the same-origin iframe.
-  const srcPhotos=document.querySelector('#dominus-photo-pages');const dstPhotos=main.querySelector('#dominus-photo-pages');if(srcPhotos&&dstPhotos)dstPhotos.innerHTML=srcPhotos.innerHTML;
+  const photoAttachments=await dominusPhotoAttachments();
+  // Nu rasterizăm anexele împreună cu formularul: altfel pozele sunt tăiate la sfârșitul paginii.
+  main.querySelector('#dominus-photo-print')?.remove();
+  const srcPhotos=document.querySelector('#dominus-photo-pages');const dstPhotos=main.querySelector('#dominus-photo-pages');if(srcPhotos&&dstPhotos)dstPhotos.innerHTML='';
   const dstPrint=main.querySelector('#dominus-photo-print'),srcPrint=document.querySelector('#dominus-photo-print');if(dstPrint&&srcPrint)dstPrint.hidden=srcPrint.hidden;
   const style=doc.createElement('style');style.textContent=`.dominus-v198-field{display:block!important;font:700 11px/1.25 Arial,sans-serif!important;min-height:17px!important;height:auto!important;padding:2px 4px!important;border:1px solid #cbd8e7!important;border-radius:7px!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;color:#111!important} .dominus-v196-print-root section{margin:5px 0!important;padding:6px 8px!important} .dominus-v196-print-root label{font-size:10px!important;margin:2px 0 1px!important} .dominus-v196-print-root h2{font-size:13px!important;margin:3px 0!important;padding:2px 0!important} .dominus-v196-print-root fieldset{padding:2px 0!important} .dominus-v196-print-root .checks label{font-size:9px!important;padding:2px 4px!important} .dominus-v196-print-root .grid{gap:3px 8px!important} .dominus-v196-print-root h3.group-heading{font-size:11px!important;margin:4px 0 2px!important;padding:3px!important}@page{size:A4;margin:10mm}html,body{width:794px!important;margin:0!important;background:white!important;color:#152e51!important}body{padding:0!important}.dominus-v196-print-root{width:794px!important;margin:0!important;padding:0 30px!important}.dominus-v196-print-root>.wrap{max-width:none!important}.dominus-v196-print-root header{display:block!important;background:white!important;color:#152e51!important}.dominus-v196-print-root .no-print,.dominus-v196-print-root .actions,.dominus-v196-print-root button,.dominus-v196-print-root .dominus-top-navigation,.dominus-v196-print-root .dominus-photo-item,.dominus-v196-print-root #dominus-photo-controls{display:none!important}#dominus-photo-print:not([hidden]){display:block!important}.dominus-photo-page{break-inside:avoid!important}.dominus-photo-page img{max-width:100%!important;max-height:950px!important;object-fit:contain!important}input,textarea,select{color:#000!important;opacity:1!important}canvas{max-width:100%}`;doc.head.appendChild(style);
   await waitImages(main);await new Promise(r=>setTimeout(r,150));
@@ -87,9 +101,50 @@ async function renderDocument(){
    .filter(el=>{const r=el.getBoundingClientRect();return r.height>0 && r.width>0})
    .map(el=>Math.max(0,el.getBoundingClientRect().top-rootRect.top));
   const canvas=await window.html2canvas(main,{backgroundColor:'#ffffff',scale:1.6,useCORS:true,allowTaint:false,logging:false,windowWidth:794,scrollX:0,scrollY:0});
-  if(canvas.width<500||canvas.height<300)throw new Error('Nu s-a putut reda formularul.');return {canvas,boundaries:boundaries.map(y=>Math.round(y*canvas.width/main.getBoundingClientRect().width))};
+  if(canvas.width<500||canvas.height<300)throw new Error('Nu s-a putut reda formularul.');return {canvas,photos:photoAttachments,boundaries:boundaries.map(y=>Math.round(y*canvas.width/main.getBoundingClientRect().width))};
  }finally{iframe.remove()}
 }
+
+// V19.16: anexele foto sunt pagini PDF independente, nu fragmente din imaginea formularului.
+async function dominusPhotoAttachments(){
+ const section=document.querySelector('#dominus-photo-print');
+ if(!section || section.hidden)return [];
+ const originals=[...section.querySelectorAll('#dominus-photo-pages img')];
+ const output=[];
+ for(let i=0;i<originals.length;i++){
+  const source=originals[i];
+  const photo=new Image();
+  photo.src=source.currentSrc||source.src;
+  try{await photo.decode()}catch(e){
+   await new Promise((resolve,reject)=>{
+    if(photo.complete&&photo.naturalWidth){resolve();return}
+    photo.onload=resolve;photo.onerror=()=>reject(new Error('Fotografia '+(i+1)+' nu poate fi citită.'));
+   });
+  }
+  if(!photo.naturalWidth||!photo.naturalHeight)throw new Error('Fotografia '+(i+1)+' este invalidă.');
+  const scale=Math.min(1,1800/Math.max(photo.naturalWidth,photo.naturalHeight));
+  const c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(photo.naturalWidth*scale));
+  c.height=Math.max(1,Math.round(photo.naturalHeight*scale));
+  const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+  ctx.drawImage(photo,0,0,c.width,c.height);
+  output.push({data:c.toDataURL('image/jpeg',0.88),width:c.width,height:c.height});
+ }
+ return output;
+}
+function dominusAppendPhotoPages(pdf,photos){
+ photos.forEach((photo,i)=>{
+  pdf.addPage('a4','portrait');
+  const pw=210,ph=297,margin=12,top=22,bottom=20;
+  const scale=Math.min((pw-2*margin)/photo.width,(ph-top-bottom)/photo.height);
+  const w=photo.width*scale,h=photo.height*scale;
+  pdf.setFont('helvetica','normal');pdf.setFontSize(10);
+  pdf.text('Anexa foto - Fotografia '+(i+1),margin,13);
+  pdf.addImage(photo.data,'JPEG',(pw-w)/2,top+(ph-top-bottom-h)/2,w,h);
+  pdf.setFontSize(8);pdf.text('Fotografia '+(i+1),pw/2,ph-10,{align:'center'});
+ });
+}
+
 function pdfFromCanvas(result,name){
  const {canvas,boundaries=[]}=result;
  const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});
@@ -122,6 +177,7 @@ function pdfFromCanvas(result,name){
   if(p)pdf.addPage();
   pdf.addImage(slice.toDataURL('image/jpeg',0.92),'JPEG',margin,margin,w,height*w/canvas.width);
  }
+ dominusAppendPhotoPages(pdf,result.photos||[]);
  return new File([pdf.output('blob')],name,{type:'application/pdf'});
 }
 function download(file){const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
