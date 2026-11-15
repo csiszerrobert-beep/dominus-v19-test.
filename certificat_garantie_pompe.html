@@ -67,17 +67,28 @@ async function renderDocument(){
   const srcInputs=document.querySelectorAll('input,textarea,select'), dstInputs=main.querySelectorAll('input,textarea,select');
   srcInputs.forEach((el,i)=>{const dst=dstInputs[i];if(!dst)return;if(el.matches('input[type=checkbox],input[type=radio]')){dst.checked=el.checked;el.checked?dst.setAttribute('checked',''):dst.removeAttribute('checked')}else if(el.tagName==='SELECT'){dst.value=el.value}else{dst.value=el.value;dst.setAttribute('value',el.value);if(dst.tagName==='TEXTAREA')dst.textContent=el.value}});
   const srcCanvases=document.querySelectorAll('canvas'),dstCanvases=main.querySelectorAll('canvas');srcCanvases.forEach((el,i)=>{try{const im=doc.createElement('img');im.src=el.toDataURL('image/png');im.style.cssText='display:block;width:100%;height:55px;object-fit:contain;border:1px solid #a6b9ce';dstCanvases[i]?.replaceWith(im)}catch(_){}});
-  // V19.15: Convert radio/checkbox controls into explicit PDF markers.
-  // html2canvas on Android does not reliably paint native checked controls.
-  // Use the ORIGINAL control state, copied above, and retain DA/NU labels.
-  for(const control of [...main.querySelectorAll('input[type="radio"],input[type="checkbox"]')]){
+  // V19.17: Rebuild radio/checkbox states from the LIVE form, not the cloned DOM.
+  // Native controls and Unicode circle glyphs are unreliable in Android html2canvas.
+  // Draw circles with CSS borders and a solid center for checked selections.
+  const liveChoices=[...document.querySelectorAll('input[type="radio"],input[type="checkbox"]')];
+  const pdfChoices=[...main.querySelectorAll('input[type="radio"],input[type="checkbox"]')];
+  pdfChoices.forEach((control,i)=>{
+   const live=liveChoices[i];
+   const checked=live ? live.checked : control.checked;
    const marker=doc.createElement('span');
-   marker.className='dominus-v1915-choice-marker';
-   marker.textContent=control.checked?'◉':'○';
-   marker.style.cssText='display:inline-block!important;vertical-align:middle!important;min-width:15px!important;margin-right:4px!important;color:#172f4c!important;font:700 15px/1 Arial,sans-serif!important;white-space:nowrap!important';
-   marker.setAttribute('aria-label',control.checked?'Selectat':'Neselectat');
+   marker.className='dominus-v1917-choice-marker';
+   marker.style.cssText='display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 13px!important;width:13px!important;height:13px!important;box-sizing:border-box!important;border:1.6px solid #173d68!important;border-radius:50%!important;background:#fff!important;vertical-align:middle!important;margin:0 5px 0 0!important;padding:0!important;position:relative!important;';
+   if(checked){
+    const dot=doc.createElement('span');
+    dot.style.cssText='display:block!important;width:7px!important;height:7px!important;flex:0 0 7px!important;border-radius:50%!important;background:#173d68!important;';
+    marker.appendChild(dot);
+   }
+   marker.setAttribute('aria-label',checked?'Selectat':'Neselectat');
    control.replaceWith(marker);
-  }
+  });
+  const choiceStyle=doc.createElement('style');
+  choiceStyle.textContent='.dominus-v196-print-root fieldset label{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:3px!important;white-space:nowrap!important;overflow:visible!important}.dominus-v1917-choice-marker{overflow:visible!important}';
+  doc.head.appendChild(choiceStyle);
   // Render values as text, not native form widgets: html2canvas clips Android input glyphs.
   for(const field of [...main.querySelectorAll('input:not([type=radio]):not([type=checkbox]),textarea')]){
    const value=field.value||'';
