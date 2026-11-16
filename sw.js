@@ -1,5 +1,5 @@
 /* Dominus V19.3 — actualizare sigură a fișierelor, fără ștergerea datelor locale */
-const CACHE = 'dominus-v19.21-clienti-auto-20261117';
+const CACHE = 'dominus-v19.23-clienti-semnaturi-20261117';
 const ASSETS = [
   './', './dominus-client-auto.js', './index.html', './programator.html', './clienti.html', './verificari.html', './constatare.html',
   './reclamatie.html', './pompe_pif.html', './certificat_garantie.html', './certificat_garantie_pompe.html',
@@ -39,7 +39,7 @@ self.addEventListener('fetch', event => {
 
   // Navigarea către formulare: online = cea mai nouă versiune;
   // offline = versiunea salvată local.
-  if (req.mode === 'navigate' || url.pathname.endsWith('.html')) {
+  if (req.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/dominus-client-auto.js')) {
     event.respondWith(
       fetch(new Request(req, { cache: 'no-store' }))
         .then(response => {
