@@ -29,7 +29,7 @@ const key='dominus-certificat-pompe-v1';
 let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
 function persist(){try{localStorage.setItem(key,JSON.stringify(saved))}catch(e){alert('Nu s-au putut salva datele local.')}}
 function update(){document.querySelectorAll('[data-id]').forEach(el=>el.textContent=saved[el.dataset.id]||'');const p=document.getElementById('sigprint');if(saved.signature){p.src=saved.signature;p.style.display='block'}else{p.style.display='none'}}
-for(const [id,label] of fields){let lab=document.createElement('label');lab.textContent=label;let inp=document.createElement('input');inp.value=saved[id]||'';if(id.startsWith('telefon')){inp.type='tel';inp.inputMode='numeric'}if(id.startsWith('data_')){inp.type='date';inp.lang='ro-RO';inp.value=toISO(saved[id]||'');}inp.addEventListener('input',()=>{saved[id]=id.startsWith('data_')?toRO(inp.value):inp.value;persist();update()});if(id.startsWith('data_')){let w=document.createElement('div');w.className='date-wrap';w.append(inp);let b=document.createElement('button');b.type='button';b.className='calendar-button';b.textContent='📅';b.title='Alege data din calendar';b.onclick=()=>{try{inp.showPicker()}catch(e){inp.focus();inp.click()}};w.append(b);lab.append(w)}else{lab.append(inp)}document.getElementById('fields').append(lab)}
+for(const [id,label] of fields){let lab=document.createElement('label');lab.textContent=label;let inp=document.createElement('input');inp.name=id;inp.id='dominus-field-'+id;inp.value=saved[id]||'';if(id.startsWith('telefon')){inp.type='tel';inp.inputMode='numeric'}if(id.startsWith('data_')){inp.type='date';inp.lang='ro-RO';inp.value=toISO(saved[id]||'');}inp.addEventListener('input',()=>{saved[id]=id.startsWith('data_')?toRO(inp.value):inp.value;persist();update()});if(id.startsWith('data_')){let w=document.createElement('div');w.className='date-wrap';w.append(inp);let b=document.createElement('button');b.type='button';b.className='calendar-button';b.textContent='📅';b.title='Alege data din calendar';b.onclick=()=>{try{inp.showPicker()}catch(e){inp.focus();inp.click()}};w.append(b);lab.append(w)}else{lab.append(inp)}document.getElementById('fields').append(lab)}
 const c=document.getElementById('sig'),ctx=c.getContext('2d');ctx.strokeStyle='#102f50';ctx.lineWidth=3.5;ctx.lineCap='round';let drawing=false;
 function coords(e){const r=c.getBoundingClientRect();return [(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]}
 c.addEventListener('pointerdown',e=>{drawing=true;c.setPointerCapture(e.pointerId);const [x,y]=coords(e);ctx.beginPath();ctx.moveTo(x,y)});
@@ -233,4 +233,4 @@ window.dominusWhatsApp=async function(){
 };
 
 })();
-</script></body></html>
+</script><script src="./dominus-client-auto.js"></script></body></html>
