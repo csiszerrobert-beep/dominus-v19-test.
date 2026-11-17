@@ -1,5 +1,5 @@
 /* Dominus V19.3 — actualizare sigură a fișierelor, fără ștergerea datelor locale */
-const CACHE = 'dominus-v19-29-echipamente-20261117';
+const CACHE = 'dominus-v19-30-revizii-20261117';
 const ASSETS = [
   './', './dominus-client-auto.js', './index.html', './programator.html', './clienti.html', './echipamente.html', './verificari.html', './constatare.html',
   './reclamatie.html', './pompe_pif.html', './certificat_garantie.html', './certificat_garantie_pompe.html',
