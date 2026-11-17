@@ -1,5 +1,5 @@
 /* Dominus V19.3 — actualizare sigură a fișierelor, fără ștergerea datelor locale */
-const CACHE = 'dominus-v19-27-clienti-istoric-20261117';
+const CACHE = 'dominus-v19-28-telefon-international-20261117';
 const ASSETS = [
   './', './dominus-client-auto.js', './index.html', './programator.html', './clienti.html', './verificari.html', './constatare.html',
   './reclamatie.html', './pompe_pif.html', './certificat_garantie.html', './certificat_garantie_pompe.html',

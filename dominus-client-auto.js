@@ -1,4 +1,4 @@
-/* Dominus V19.27 TEST - salvare exclusiv la export si istoric documente. */
+/* Dominus V19.28 TEST - salvare exclusiv la export si istoric documente. */
 (function(){'use strict';
 const KEY='dominus-clienti-v1';
 const maps={
@@ -12,7 +12,22 @@ const maps={
 const page=location.pathname.split('/').pop(),map=maps[page];if(!map)return;
 const norm=s=>String(s||'').trim().replace(/\s+/g,' '),fold=s=>norm(s).toLocaleLowerCase('ro-RO').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const digits=s=>norm(s).replace(/\D/g,'');
-function phone(s){const n=digits(s);return n.length===11&&n.startsWith('40')?'0'+n.slice(2):n}
+// Normalizeaza doar prefixele cunoscute; nu ghicim tara pentru numere locale straine.
+function phone(s){
+ const raw=norm(s).replace(/[\s().-]/g,'');
+ if(!raw)return '';
+ if(!/^(?:\+|00)?\d+$/.test(raw))return '';
+ let n=raw.startsWith('00')?'+'+raw.slice(2):raw;
+ if(n.startsWith('+')){
+   const d=n.slice(1);
+   if(d.length<7||d.length>15||d[0]==='0')return '';
+   return d.startsWith('40')&&d.length===11?'0'+d.slice(2):'+'+d;
+ }
+ if(n.startsWith('0')&&n.length===10)return n;
+ // Numerele nationale straine nu au obligatoriu 10 cifre.
+ if(n.length>=7&&n.length<=15 && !(n.startsWith('07')&&n.length!==10))return n;
+ return '';
+}
 function field(id){return [...document.querySelectorAll('input,textarea,select')].find(e=>e.name===id||e.id===id||e.dataset.field===id)||null}
 function draft(){if(!map.draft)return {};try{return JSON.parse(localStorage.getItem(map.draft)||'{}')||{}}catch(e){return {}}}
 function get(id){if(!id)return '';const el=field(id);return norm(el?el.value:draft()[id])}
@@ -23,7 +38,7 @@ function commit(){
   mirrorName();
   const d={name:get(map.name),phone:get(map.phone),email:get(map.email),address:get(map.address)};
   if(fold(d.name).length<3)return false;
-  const p=phone(d.phone);if(p&&!(p.length===10&&p[0]==='0'))return false;
+  const p=phone(d.phone);if(d.phone&&!p){if(!d.address&&!d.email)return false;d.phone='';}
   if(!p&&!d.address&&!d.email)return false;
   const signature=[fold(d.name),p,fold(d.address),fold(d.email),map.title].join('|');
   const now=Date.now();if(signature===lastSignature&&now-lastAt<12000)return true;
