@@ -210,9 +210,45 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       fig.append(big,caption);pages.append(fig);
     });
   }
-  function add(input){
-    Array.from(input.files||[]).filter(f=>f.type.startsWith('image/')).forEach(f=>photos.push({url:URL.createObjectURL(f)}));
-    input.value='';render();
+  // V19.33: comprimare la atașare, fără încărcare în cloud sau stocare permanentă.
+  // Păstrăm URL-uri blob pentru previzualizare și pentru anexele PDF.
+  async function compressPhoto(file){
+    const original=URL.createObjectURL(file);
+    try{
+      const picture=new Image();
+      picture.src=original;
+      if(picture.decode) await picture.decode();
+      else await new Promise((resolve,reject)=>{picture.onload=resolve;picture.onerror=reject;});
+      const w=picture.naturalWidth,h=picture.naturalHeight;
+      if(!w||!h) throw new Error('Imagine invalidă');
+      const ratio=Math.min(1,1600/Math.max(w,h));
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.round(w*ratio));
+      canvas.height=Math.max(1,Math.round(h*ratio));
+      const ctx=canvas.getContext('2d');
+      if(!ctx) throw new Error('Canvas indisponibil');
+      ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(picture,0,0,canvas.width,canvas.height);
+      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.85));
+      if(!blob) throw new Error('Comprimarea nu a reușit');
+      // Nu păstrăm o variantă mai mare decât originalul.
+      if(blob.size>=file.size) return original;
+      const compressedUrl=URL.createObjectURL(blob);
+      URL.revokeObjectURL(original);
+      return compressedUrl;
+    }catch(error){
+      console.warn('Dominus: fotografia rămâne originală',error);
+      return original;
+    }
+  }
+  async function add(input){
+    const selected=Array.from(input.files||[]).filter(f=>f.type.startsWith('image/'));
+    input.value='';
+    for(const file of selected){
+      const url=await compressPhoto(file);
+      photos.push({url});
+      render();
+    }
   }
   camera.addEventListener('change',()=>add(camera));
   gallery.addEventListener('change',()=>add(gallery));
@@ -327,13 +363,13 @@ async function dominusPhotoAttachments(){
    });
   }
   if(!photo.naturalWidth||!photo.naturalHeight)throw new Error('Fotografia '+(i+1)+' este invalidă.');
-  const scale=Math.min(1,1800/Math.max(photo.naturalWidth,photo.naturalHeight));
+  const scale=Math.min(1,1600/Math.max(photo.naturalWidth,photo.naturalHeight));
   const c=document.createElement('canvas');
   c.width=Math.max(1,Math.round(photo.naturalWidth*scale));
   c.height=Math.max(1,Math.round(photo.naturalHeight*scale));
   const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
   ctx.drawImage(photo,0,0,c.width,c.height);
-  output.push({data:c.toDataURL('image/jpeg',0.88),width:c.width,height:c.height});
+  output.push({data:c.toDataURL('image/jpeg',0.85),width:c.width,height:c.height});
  }
  return output;
 }
