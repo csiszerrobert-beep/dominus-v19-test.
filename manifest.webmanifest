@@ -1,1 +1,22 @@
-{"name": "ES Romania", "short_name": "ES Romania", "description": "Formulare pentru tehnicieni Energy Save", "start_url": "./index.html", "scope": "./", "display": "standalone", "background_color": "#f0f5f9", "theme_color": "#102d47", "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png"}, {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}]}
+{
+  "name": "DOMINUS",
+  "short_name": "DOMINUS",
+  "description": "DOMINUS - aplicație pentru intervenții și documente de service",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f0f5f9",
+  "theme_color": "#102d47",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

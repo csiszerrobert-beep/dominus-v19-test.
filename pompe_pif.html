@@ -287,7 +287,9 @@ async function renderDocument(){
 async function dominusPhotoAttachments(){
  const section=document.querySelector('#dominus-photo-print');
  if(!section || section.hidden)return [];
- const originals=[...section.querySelectorAll('#dominus-photo-pages img')];
+ const originals=[...section.querySelectorAll('#dominus-photo-pages .dominus-photo-page img')];
+ const expected=document.querySelectorAll('#dominus-photo-list .dominus-photo-item').length;
+ if(originals.length!==expected)throw new Error('Anexele foto nu sunt pregătite. Așteaptă câteva secunde și încearcă din nou.');
  const output=[];
  for(let i=0;i<originals.length;i++){
   const source=originals[i];
@@ -308,6 +310,7 @@ async function dominusPhotoAttachments(){
   ctx.drawImage(photo,0,0,c.width,c.height);
   output.push({data:c.toDataURL('image/jpeg',0.85),width:c.width,height:c.height});
  }
+ if(output.length!==expected)throw new Error('Nu au fost preluate toate fotografiile.');
  return output;
 }
 function dominusAppendPhotoPages(pdf,photos){
@@ -400,4 +403,4 @@ window.dominusWhatsApp=async function(){
 };
 
 })();
-</script><script src="./dominus-client-auto.js?v=1929"></script><script src="./dominus-autofill.js?v=1931"></script></body></html>
+</script><script src="./dominus-client-auto.js?v=1929"></script><script src="./dominus-autofill.js?v=1931"></script><script src="./dominus-ios-pdf.js?v=19332"></script></body></html>
