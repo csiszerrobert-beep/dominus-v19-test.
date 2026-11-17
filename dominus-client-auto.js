@@ -1,13 +1,13 @@
-/* Dominus V19.28 TEST - salvare exclusiv la export si istoric documente. */
+/* Dominus V19.29 TEST - salvare exclusiv la export si istoric documente. */
 (function(){'use strict';
-const KEY='dominus-clienti-v1';
+const KEY='dominus-clienti-v1', EQUIPMENT_KEY='dominus-echipamente-v1';
 const maps={
- 'constatare.html':{name:'constatare_Be_0',phone:'constatare_Be_1',email:'constatare_Be_2',address:'constatare_Be_3',sign:'nume_beneficiar',title:'Fișă de constatare'},
- 'reclamatie.html':{name:'reclamatie_Be_0',phone:'reclamatie_Be_1',email:'reclamatie_Be_2',address:'reclamatie_Be_3',sign:'nume_beneficiar',title:'Fișă de reclamație'},
- 'verificari.html':{name:'beneficiar',phone:'beneficiar_telefon',email:'beneficiar_email',address:'beneficiar_adresa',sign:'semnatar_beneficiar',title:'Fișă de verificare'},
- 'pompe_pif.html':{name:'sec1_p0',phone:'sec1_p2',address:'sec1_p1',sign:'semn_nume_client',title:'Punere în funcțiune pompe'},
- 'certificat_garantie.html':{name:'cumparator_nume',phone:'cumparator_telefon',address:'cumparator_adresa',draft:'dominus-certificat-garantie-v9',title:'Certificat de garanție'},
- 'certificat_garantie_pompe.html':{name:'beneficiar',phone:'telefon_beneficiar',address:'adresa_beneficiar',sign:'cumparator_semn',title:'Certificat de garanție pompe'}
+ 'constatare.html':{name:'constatare_Be_0',phone:'constatare_Be_1',email:'constatare_Be_2',address:'constatare_Be_3',sign:'nume_beneficiar',title:'Fișă de constatare',equipment:{brand:'constatare_Be_5',model:'constatare_Be_6',serial:'constatare_Be_7'}},
+ 'reclamatie.html':{name:'reclamatie_Be_0',phone:'reclamatie_Be_1',email:'reclamatie_Be_2',address:'reclamatie_Be_3',sign:'nume_beneficiar',title:'Fișă de reclamație',equipment:{brand:'reclamatie_Be_5',model:'reclamatie_Be_6',serial:'reclamatie_Be_7'}},
+ 'verificari.html':{name:'beneficiar',phone:'beneficiar_telefon',email:'beneficiar_email',address:'beneficiar_adresa',sign:'semnatar_beneficiar',title:'Fișă de verificare',equipment:{brand:'marca',model:'model',serial:'serie'}},
+ 'pompe_pif.html':{name:'sec1_p0',phone:'sec1_p2',address:'sec1_p1',sign:'semn_nume_client',title:'Punere în funcțiune pompe',equipment:{model:'sec2_p0',serial:'sec2_p1',kind:'Pompă de căldură',commissioned:'sec9_p4'}},
+ 'certificat_garantie.html':{name:'cumparator_nume',phone:'cumparator_telefon',address:'cumparator_adresa',draft:'dominus-certificat-garantie-v9',title:'Certificat de garanție',equipment:{model:'produs_tip',serial:'produs_serie'}},
+ 'certificat_garantie_pompe.html':{name:'beneficiar',phone:'telefon_beneficiar',address:'adresa_beneficiar',sign:'cumparator_semn',title:'Certificat de garanție pompe',equipment:{model:'produs',serial:'serie',kind:'Pompă de căldură'}}
 };
 const page=location.pathname.split('/').pop(),map=maps[page];if(!map)return;
 const norm=s=>String(s||'').trim().replace(/\s+/g,' '),fold=s=>norm(s).toLocaleLowerCase('ro-RO').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -50,6 +50,27 @@ function commit(){
   const c=list[i];for(const k of ['phone','email','address'])if(d[k]&&!norm(c[k]))c[k]=d[k];
   if(!Array.isArray(c.documents))c.documents=[];
   c.documents.push({id:(crypto.randomUUID?.()||String(now)+'-'+Math.random()),type:map.title,date:new Date().toISOString(),source:page});
+  // Registrul echipamentelor: se actualizează doar la exportul documentului.
+  // Clientul este identificat mai întâi; niciun echipament nu se salvează în timpul tastării.
+  const em=map.equipment||{};
+  const eq={brand:get(em.brand),model:get(em.model),serial:get(em.serial),kind:em.kind||'',commissioned:get(em.commissioned)};
+  const meaningful=Boolean(eq.model||eq.serial);
+  if(meaningful){
+    let equipments=[];
+    try{const stored=JSON.parse(localStorage.getItem(EQUIPMENT_KEY)||'[]');if(Array.isArray(stored))equipments=stored}catch(_){}
+    const owner=c.id;
+    const serial=fold(eq.serial),model=fold(eq.model),brand=fold(eq.brand);
+    // Seria este identificatorul principal, în cadrul beneficiarului.
+    // Fără serie, asociem numai dacă există un singur model identic la client.
+    let ix=serial?equipments.findIndex(x=>x.clientId===owner&&fold(x.serial)===serial):-1;
+    if(ix<0&&!serial&&model){const matches=equipments.map((x,j)=>({x,j})).filter(v=>v.x.clientId===owner&&!fold(v.x.serial)&&fold(v.x.model)===model&&fold(v.x.brand)===brand);if(matches.length===1)ix=matches[0].j}
+    if(ix<0){equipments.push({id:(crypto.randomUUID?.()||String(now)+'-eq-'+Math.random()),clientId:owner,...eq,createdAt:new Date().toISOString(),documents:[]});ix=equipments.length-1}
+    const device=equipments[ix];
+    for(const k of ['brand','model','serial','kind','commissioned'])if(!device[k]&&eq[k])device[k]=eq[k];
+    if(!Array.isArray(device.documents))device.documents=[];
+    device.documents.push({id:(crypto.randomUUID?.()||String(now)+'-doc-'+Math.random()),type:map.title,date:new Date().toISOString(),source:page});
+    try{localStorage.setItem(EQUIPMENT_KEY,JSON.stringify(equipments))}catch(e){console.warn('Dominus: registrul echipamentelor nu a putut fi salvat.',e)}
+  }
   localStorage.setItem(KEY,JSON.stringify(list));lastSignature=signature;lastAt=now;return true;
  }catch(e){console.warn('Dominus: nu s-a putut actualiza registrul.',e);return false}
 }
