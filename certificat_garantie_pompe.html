@@ -49,12 +49,12 @@ function libraries(){
  function load(src,check){return new Promise((resolve,reject)=>{if(check())return resolve();const el=document.createElement('script');el.src=src;el.onload=()=>check()?resolve():reject(new Error('Biblioteca nu a pornit'));el.onerror=()=>reject(new Error('Nu se poate încărca biblioteca. Verifică internetul.'));document.head.appendChild(el);});}
  loading=Promise.all([load('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',()=>!!window.html2canvas),load('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',()=>!!window.jspdf?.jsPDF)]).catch(e=>{loading=null;throw e});return loading;
 }
-function fileName(){const d=new Date().toISOString().slice(0,10);let name=prompt('Numele PDF-ului de test:',`Dominus_certificat_garantie_pompe_V19.10_${d}.pdf`);if(name===null)return null;name=name.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g,'_').replace(/\.+$/,'');return name?(name.toLowerCase().endsWith('.pdf')?name:name+'.pdf'):null;}
+function fileName(){const d=new Date().toISOString().slice(0,10);if(window.dominusIOS)return "Dominus_certificat_garantie_pompe_"+d+".pdf";let name=prompt('Numele PDF-ului de test:',`Dominus_certificat_garantie_pompe_V19.10_${d}.pdf`);if(name===null)return null;name=name.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g,'_').replace(/\.+$/,'');return name?(name.toLowerCase().endsWith('.pdf')?name:name+'.pdf'):null;}
 function waitImages(root){return Promise.all(Array.from(root.querySelectorAll('img')).map(im=>im.complete?Promise.resolve():new Promise(r=>{im.addEventListener('load',r,{once:true});im.addEventListener('error',r,{once:true});setTimeout(r,5000)})));}
 async function renderDocument(){
  const iframe=document.createElement('iframe');iframe.setAttribute('aria-hidden','true');iframe.style.cssText='position:fixed;left:-12000px;top:0;width:794px;height:1123px;border:0;pointer-events:none;';document.body.appendChild(iframe);
  try{
-  const doc=iframe.contentDocument;doc.open();doc.write('<!doctype html><html lang="ro"><head><meta charset="utf-8"></head><body></body></html>');doc.close();
+  const doc=iframe.contentDocument;doc.open();doc.write('<!doctype html><html lang="ro"><head><meta charset="utf-8"></head><body><script src="./dominus-ios-pdf.js?v=19334"></script></body></html>');doc.close();
   // Copy the form and its styles. Convert the print CSS to screen rules in the isolated frame.
   for(const style of document.querySelectorAll('style')){
    const sheet=doc.createElement('style');sheet.textContent=style.textContent;doc.head.appendChild(sheet);
@@ -195,6 +195,8 @@ function download(file){const url=URL.createObjectURL(file),a=document.createEle
 
 let preparedFile=null;
 function showReady(file){
+ if(window.dominusIOSReady){window.dominusIOSReady(file);return;}
+
  preparedFile=file;
  let dialog=document.getElementById('dominus-v197-ready');
  if(!dialog){

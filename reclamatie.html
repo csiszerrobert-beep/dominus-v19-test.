@@ -175,7 +175,7 @@ function libraries(){
  function load(src,check){return new Promise((resolve,reject)=>{if(check())return resolve();const el=document.createElement('script');el.src=src;el.onload=()=>check()?resolve():reject(new Error('Biblioteca nu a pornit'));el.onerror=()=>reject(new Error('Nu se poate încărca biblioteca. Verifică internetul.'));document.head.appendChild(el);});}
  loading=Promise.all([load('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',()=>!!window.html2canvas),load('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',()=>!!window.jspdf?.jsPDF)]).catch(e=>{loading=null;throw e});return loading;
 }
-function fileName(){const d=new Date().toISOString().slice(0,10);let name=prompt('Numele PDF-ului de test:',`Dominus_reclamatie_V19.10_${d}.pdf`);if(name===null)return null;name=name.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g,'_').replace(/\.+$/,'');return name?(name.toLowerCase().endsWith('.pdf')?name:name+'.pdf'):null;}
+function fileName(){const d=new Date().toISOString().slice(0,10);if(window.dominusIOS)return "Dominus_reclamatie_"+d+".pdf";if(window.dominusDirectPdfMode)return 'Dominus_reclamatie_'+d+'.pdf';let name=prompt('Numele PDF-ului de test:',`Dominus_reclamatie_V19.10_${d}.pdf`);if(name===null)return null;name=name.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g,'_').replace(/\.+$/,'');return name?(name.toLowerCase().endsWith('.pdf')?name:name+'.pdf'):null;}
 function waitImages(root){return Promise.all(Array.from(root.querySelectorAll('img')).map(im=>im.complete?Promise.resolve():new Promise(r=>{im.addEventListener('load',r,{once:true});im.addEventListener('error',r,{once:true});setTimeout(r,5000)})));}
 async function renderDocument(){
  const iframe=document.createElement('iframe');iframe.setAttribute('aria-hidden','true');iframe.style.cssText='position:fixed;left:-12000px;top:0;width:794px;height:1123px;border:0;pointer-events:none;';document.body.appendChild(iframe);
@@ -324,12 +324,16 @@ function download(file){const url=URL.createObjectURL(file),a=document.createEle
 
 let preparedFile=null;
 function showReady(file){
+ if(window.dominusIOSReady){window.dominusIOSReady(file);return;}
+
+ if(window.dominusDirectPdfMode){download(file);return;}
+
  preparedFile=file;
  let dialog=document.getElementById('dominus-v197-ready');
  if(!dialog){
   dialog=document.createElement('div');dialog.id='dominus-v197-ready';
   dialog.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#0009;display:flex;align-items:center;justify-content:center;padding:18px';
-  dialog.innerHTML='<div style="background:white;color:#173253;border-radius:16px;padding:22px;max-width:430px;width:100%;box-shadow:0 8px 35px #0004"><h2 style="margin:0 0 10px">PDF pregătit – V19.14 TEST</h2><p id="dominus-v197-name" style="overflow-wrap:anywhere"></p><p style="font-size:13px">Apasă „Salvează și distribuie” pentru a descărca PDF-ul în telefon și a deschide meniul Android. Dacă descărcarea este blocată de browser, folosește „Descarcă PDF”.</p><button type="button" id="dominus-v197-share" style="width:100%;margin:5px 0">🟢 Salvează și distribuie</button><button type="button" id="dominus-v197-save" class="secondary" style="width:100%;margin:5px 0">Descarcă PDF</button><button type="button" id="dominus-v197-close" class="secondary" style="width:100%;margin:5px 0">Închide</button></div>';
+  dialog.innerHTML='<div style="background:white;color:#173253;border-radius:16px;padding:22px;max-width:430px;width:100%;box-shadow:0 8px 35px #0004"><h2 style="margin:0 0 10px">PDF pregătit – DOMINUS TEST</h2><p id="dominus-v197-name" style="overflow-wrap:anywhere"></p><p style="font-size:13px">Apasă „Salvează și distribuie” pentru a descărca PDF-ul în telefon și a deschide meniul Android. Dacă descărcarea este blocată de browser, folosește „Descarcă PDF”.</p><button type="button" id="dominus-v197-share" style="width:100%;margin:5px 0">🟢 Salvează și distribuie</button><button type="button" id="dominus-v197-save" class="secondary" style="width:100%;margin:5px 0">Descarcă PDF</button><button type="button" id="dominus-v197-close" class="secondary" style="width:100%;margin:5px 0">Închide</button></div>';
   document.body.appendChild(dialog);
   document.getElementById('dominus-v197-share').addEventListener('click',()=>{
    // Call share immediately from a fresh user gesture, with no await beforehand.
@@ -362,4 +366,4 @@ window.dominusWhatsApp=async function(){
 };
 
 })();
-</script><script src="./dominus-client-auto.js?v=1929"></script><script src="./dominus-autofill.js?v=1931"></script><script src="./dominus-ios-pdf.js?v=19332"></script></body></html>
+</script><script src="./dominus-client-auto.js?v=1929"></script><script src="./dominus-autofill.js?v=1931"></script><script src="./dominus-ios-pdf.js?v=19334"></script></body></html>
