@@ -81,7 +81,7 @@ addDateBoxes('data_pif',2,610,785,34);
 const oldUpdate=update;update=function(id){oldUpdate(id);document.querySelectorAll('[data-date-id="'+id+'"]').forEach(el=>{let v=toRO(saved[id]||'');let m=v.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);let digits=m?m[1]+m[2]+m[3].slice(-2):'';el.textContent=digits[Number(el.dataset.dateIndex)]||''})};
 update('vanzator_data');update('data_pif');
 let activeCanvas=null;for(let rec of sigs){let [id,label]=rec;let s=document.createElement('section');s.className='section signature';let h=document.createElement('h2');h.textContent=label;s.append(h);let canvas=document.createElement('canvas');canvas.width=750;canvas.height=200;let ctx=canvas.getContext('2d');ctx.strokeStyle='#172f4d';ctx.lineWidth=3;ctx.lineCap='round';if(saved[id]){let img=new Image();img.onload=()=>ctx.drawImage(img,0,0,canvas.width,canvas.height);img.src=saved[id]}let drawing=false;function coord(e){let r=canvas.getBoundingClientRect();return [(e.clientX-r.left)*canvas.width/r.width,(e.clientY-r.top)*canvas.height/r.height]}canvas.addEventListener('pointerdown',e=>{drawing=true;canvas.setPointerCapture(e.pointerId);let [x,y]=coord(e);ctx.beginPath();ctx.moveTo(x,y)});canvas.addEventListener('pointermove',e=>{if(!drawing)return;let [x,y]=coord(e);ctx.lineTo(x,y);ctx.stroke()});function finish(){if(!drawing)return;drawing=false;saved[id]=canvas.toDataURL('image/png');persist();update(id)}canvas.addEventListener('pointerup',finish);canvas.addEventListener('pointercancel',finish);s.append(canvas);let clear=document.createElement('button');clear.textContent='Șterge semnătura';clear.className='secondary';clear.onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);delete saved[id];persist();update(id)};s.append(clear);document.getElementById('edit').append(s);let el=document.createElement('img');el.id='o_'+id;el.dataset.field=id;el.className='overlay sig';position(el,rec);document.getElementById('page'+rec[2]).append(el);update(id)}
-function clearAll(){if(!confirm('Ștergi toate datele și semnăturile din certificatul de garanție?'))return;localStorage.removeItem(key);location.reload()}
+function clearAll(){if(!confirm('Ștergi toate datele și semnăturile din certificatul de garanție?'))return;window.dominusClientNewDocument?.();localStorage.removeItem(key);location.reload()}
 </script>
 <script id="dominus-telefon-cifre-v15">
 (function(){
@@ -175,4 +175,4 @@ window.dominusWhatsApp=async function(){
 };
 
 })();
-</script><script src="./dominus-client-auto.js?v=1929"></script><script src="./dominus-autofill.js?v=1931"></script><script src="./dominus-ios-pdf.js?v=19334"></script></body></html>
+</script><script src="./dominus-client-auto.js?v=19335"></script><script src="./dominus-autofill.js?v=1931"></script><script src="./dominus-ios-pdf.js?v=19334"></script></body></html>

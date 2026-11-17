@@ -38,7 +38,7 @@ function finish(){if(!drawing)return;drawing=false;saved.signature=c.toDataURL('
 c.addEventListener('pointerup',finish);c.addEventListener('pointercancel',finish);
 if(saved.signature){let im=new Image();im.onload=()=>ctx.drawImage(im,0,0,c.width,c.height);im.src=saved.signature}
 function clearSignature(){ctx.clearRect(0,0,c.width,c.height);delete saved.signature;persist();update()}
-function clearData(){if(!confirm('Ștergi toate datele acestui certificat?'))return;localStorage.removeItem(key);location.reload()}
+function clearData(){if(!confirm('Ștergi toate datele acestui certificat?'))return;window.dominusClientNewDocument?.();localStorage.removeItem(key);location.reload()}
 update();
 </script><nav class="dominus-bottom-nav" aria-label="Navigare formular"><button type="button" class="dominus-print-bottom" onclick="window.print()">🖨️ Imprimă / Salvează PDF</button><button type="button" id="dominus-go-top">↑ Sus</button><a href="index.html" id="dominus-back-menu">← Înapoi la meniu</a></nav><script id="dominus-bottom-nav-script">(function(){var back=document.getElementById('dominus-back-menu');back.addEventListener('click',function(){if(typeof window.save==='function'){try{window.save()}catch(e){}}});document.getElementById('dominus-go-top').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})})();</script><nav class="dominus-v17-bar no-print" aria-label="Acțiuni rapide"><button type="button" onclick="dominusV17Save()">💾 Salvare</button><button type="button" onclick="dominusV17Print()">🖨️ PDF</button><button type="button" onclick="dominusV17Email()">✉️ E-mail</button><button type="button" class="wa" onclick="dominusWhatsApp()">🟢 WhatsApp</button><button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Sus</button><a href="index.html">← Meniu</a></nav><script id="dominus-v17-adapter">window.dominusV17Save=function(){try{if(typeof save==='function')return save();if(typeof saveData==='function')return saveData();if(typeof saveAll==='function')return saveAll();}catch(e){alert('Salvarea nu a reușit.');return;}alert('Datele acestui certificat sunt păstrate automat în browser, dacă este activată salvarea locală.');};window.dominusV17Print=function(){try{if(typeof save==='function')save();}catch(e){}window.print()};window.dominusV17Email=function(){if(typeof sendEmail==='function')return sendEmail();if(typeof email==='function')return email();alert('Salvează PDF-ul și atașează-l într-un e-mail.');};</script><script id="dominus-v1910-layout-pdf">
 (function(){
@@ -235,4 +235,4 @@ window.dominusWhatsApp=async function(){
 };
 
 })();
-</script><script src="./dominus-client-auto.js?v=1929"></script><script src="./dominus-autofill.js?v=1931"></script></body></html>
+</script><script src="./dominus-client-auto.js?v=19335"></script><script src="./dominus-autofill.js?v=1931"></script></body></html>

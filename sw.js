@@ -1,5 +1,5 @@
 /* Dominus V19.3 — actualizare sigură a fișierelor, fără ștergerea datelor locale */
-const CACHE = 'dominus-v19-33-4-ios-pdf-share-20261117';
+const CACHE = 'dominus-v19-33-5-test-dedup-20261117';
 const ASSETS = [
   './', './dominus-ios-pdf.js', './dominus-client-auto.js', './dominus-autofill.js', './index.html', './programator.html', './clienti.html', './echipamente.html', './verificari.html', './constatare.html',
   './reclamatie.html', './pompe_pif.html', './certificat_garantie.html', './certificat_garantie_pompe.html',
