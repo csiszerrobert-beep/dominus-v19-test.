@@ -19,28 +19,29 @@ $('dedup').onclick=()=>{
  const norm=s=>txt(s).trim().toLocaleLowerCase('ro').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');
  const phone=s=>txt(s).replace(/[^\d+]/g,'');
  const groups=new Map();
- clients.forEach(c=>{const ph=phone(c.phone),addr=norm(c.address);if(!ph||!addr)return;const k=ph+'|'+addr;groups.set(k,[...(groups.get(k)||[]),c])});
+ clients.forEach(c=>{const addr=norm(c.address),name=norm(c.name);if(!addr||!name)return;const k=name+'|'+addr;groups.set(k,[...(groups.get(k)||[]),c])});
  const removals=new Set(),updates=new Map();let count=0;
  for(const group of groups.values()){
    if(group.length<2)continue;
-   group.sort((a,b)=>b.name.length-a.name.length);
+   group.sort((a,b)=>phone(b.phone).length-phone(a.phone).length);
    for(let i=0;i<group.length;i++){
      const main=group[i];if(removals.has(main.id))continue;
-     const merged={...updates.get(main.id)||main};
+     const merged={...(updates.get(main.id)||main)};
      for(let j=i+1;j<group.length;j++){
        const other=group[j];if(removals.has(other.id))continue;
-       const a=norm(merged.name),b=norm(other.name);
-       if(Math.min(a.length,b.length)<3||!(a.startsWith(b)||b.startsWith(a)))continue;
-       // Nu uni fise cu date contradictorii.
+       const a=phone(merged.phone).replace(/^40(?=\d{9}$)/,'0');
+       const b=phone(other.phone).replace(/^40(?=\d{9}$)/,'0');
+       if(a&&b&&!(a===b||a.startsWith(b)||b.startsWith(a)))continue;
        if(merged.email&&other.email&&norm(merged.email)!==norm(other.email))continue;
-       for(const k of ['phone','email','address','notes'])if(!merged[k]&&other[k])merged[k]=other[k];
+       if(b.length>a.length)merged.phone=other.phone;
+       for(const k of ['email','address','notes'])if(!merged[k]&&other[k])merged[k]=other[k];
        removals.add(other.id);count++;
      }
      updates.set(main.id,merged);
    }
  }
- if(!count){alert('Nu au fost gasite duplicate sigure. Clientii cu acelasi telefon, dar nume diferite, nu sunt uniti automat.');return}
- if(!confirm('Am gasit '+count+' inregistrari partiale duplicate (acelasi telefon si adresa, nume prescurtat). Se descarca mai intai un backup, apoi se unesc. Continui?'))return;
+ if(!count){alert('Nu au fost gasite duplicate sigure cu acelasi nume si adresa. Numele diferite nu sunt unite automat.');return}
+ if(!confirm('Am gasit '+count+' inregistrari duplicate (acelasi nume si adresa, telefon introdus partial). Se descarca mai intai un backup, apoi se unesc. Continui?'))return;
  download('Dominus_clienti_INAINTE_DE_CURATARE_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({app:'Dominus Clienti',version:1,exportedAt:new Date().toISOString(),clients},null,2));
  const prev=clients;clients=clients.filter(c=>!removals.has(c.id)).map(c=>updates.get(c.id)||c);
  if(!save()){clients=prev;return}render();alert('Au fost unite '+count+' inregistrari. Pastreaza fisierul backup.');

@@ -356,7 +356,7 @@ window.dominusWhatsApp=async function(){
   await libraries();
   const canvas=await renderDocument();
   const file=pdfFromCanvas(canvas,name);
-  showReady(file);
+  showReady(file); window.dominusClientCommit?.();
  }catch(e){
   console.error('Dominus V19.10:',e);
   alert('Testul V19.10 nu a reușit: '+e.message+'\nFolosește PDF / Imprimă pentru documentul original.');
@@ -364,4 +364,4 @@ window.dominusWhatsApp=async function(){
 };
 
 })();
-</script><script src="./dominus-client-auto.js?v=1923"></script></body></html>
+</script><script src="./dominus-client-auto.js?v=1925"></script></body></html>
