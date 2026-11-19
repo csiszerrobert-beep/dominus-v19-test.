@@ -1,8 +1,8 @@
 {
-  "name": "DOMINUS",
+  "name": "DOMINUS V20 TEST",
   "short_name": "DOMINUS",
   "description": "DOMINUS - aplicație pentru intervenții și documente de service",
-  "start_url": "./index.html",
+  "start_url": "./login.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f0f5f9",

@@ -45,8 +45,9 @@ window.dominusClientNewDocument=function(){
 let lastSignature='',lastAt=0;
 function commit(){
  try{
+  const nameEl=field(map.name);if(nameEl&&window.dominusNameCase)nameEl.value=window.dominusNameCase(nameEl.value);
   mirrorName();
-  const d={name:get(map.name),phone:get(map.phone),email:get(map.email),address:get(map.address)};
+  const d={name:(window.dominusNameCase?window.dominusNameCase(get(map.name)):get(map.name)),phone:get(map.phone),email:get(map.email),address:get(map.address)};
   if(fold(d.name).length<3)return false;
   const p=phone(d.phone);if(d.phone&&!p){if(!d.address&&!d.email)return false;d.phone='';}
   if(!p&&!d.address&&!d.email)return false;
@@ -92,7 +93,7 @@ function commit(){
 }
 window.dominusClientCommit=commit;
 document.addEventListener('input',e=>{if(e.target===field(map.name))mirrorName()},true);
-document.addEventListener('change',e=>{if(e.target===field(map.name))mirrorName()},true);
+document.addEventListener('change',e=>{if(e.target===field(map.name)){if(window.dominusNameCase)e.target.value=window.dominusNameCase(e.target.value);mirrorName()}},true);
 window.addEventListener('beforeprint',commit);
 document.addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;const action=(btn.getAttribute('onclick')||'').toLowerCase();if(action.includes('print()')||action.includes('dominusv17print()'))commit()},true);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mirrorName);else mirrorName();

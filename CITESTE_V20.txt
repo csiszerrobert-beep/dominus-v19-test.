@@ -1,0 +1,13 @@
+DOMINUS V20 TEST – ETAPA AUTENTIFICARE / ADMIN
+
+1. Această arhivă este destinată DOAR depozitului TEST, NU proiectului principal.
+2. În Supabase > Project Settings > API Keys copiază numai cheia PUBLICĂ (publishable / anon), NICIODATĂ service_role / secret.
+3. Deschide dominus-config.js și înlocuiește INLOCUIESTE_CU_CHEIA_PUBLICA_SUPABASE cu cheia publică. URL-ul Supabase este deja configurat.
+4. În Supabase > Authentication > URL Configuration configurează Site URL și Redirect URLs pentru https://csiszerrobert-beep.github.io/dominus-v19-test/ (inclusiv login.html, dacă este nevoie).
+5. Publică arhiva în repository-ul TEST. Deschide .../dominus-v19-test/login.html.
+6. Verifică ADMIN login, lista tehnicienilor, invitația și refuzul accesului neautorizat.
+
+ATENȚIE: Această etapă NU migrează date, NU sincronizează offline și NU face disponibile registrele V19 pentru tehnicieni. Paginile V19 sunt vizibile doar pentru ADMIN autentificat online; nu constituie izolare definitivă a datelor locale, care rămân pe dispozitiv. Nu folosi pe dispozitive partajate cu tehnicienii înainte de migrarea datelor.
+Pentru schimbarea parolei din e-mail este necesară configurarea fluxului de recuperare în etapa următoare.
+Supabase JS este încărcat din CDN; autentificarea inițială necesită internet.
+V19.33.5 FINAL rămâne arhiva de rezervă.

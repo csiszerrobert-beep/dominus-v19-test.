@@ -1,2 +1,2 @@
-DOMINUS V19.33.5 TEST
-Corecție: același raport se înregistrează o singură dată în istoricul clientului și al echipamentului la Salvează/PDF/WhatsApp. Un formular nou primește ID nou. Nu șterge datele browserului. Instalează numai în dominus-v19-test.
+DOMINUS V19.33.5 FINAL
+Corectare duplicate la salvarea aceluiași raport + nume și prenume cu inițială mare automat (ex. Cornel Petrescu). Denumirile firmelor cu SRL/SA/PFA sunt păstrate. Pentru aplicația principală Dominus. Nu șterge datele browserului.

@@ -1,7 +1,7 @@
 /* Dominus V19.3 — actualizare sigură a fișierelor, fără ștergerea datelor locale */
-const CACHE = 'dominus-v19-33-5-test-dedup-20261117';
+const CACHE = 'dominus-v20-test-auth-20261119';
 const ASSETS = [
-  './', './dominus-ios-pdf.js', './dominus-client-auto.js', './dominus-autofill.js', './index.html', './programator.html', './clienti.html', './echipamente.html', './verificari.html', './constatare.html',
+  './', './login.html', './admin.html', './tehnician.html', './dominus-config.js', './dominus-auth.js', './dominus-ios-pdf.js', './dominus-client-auto.js', './dominus-autofill.js', './index.html', './programator.html', './clienti.html', './echipamente.html', './verificari.html', './constatare.html',
   './reclamatie.html', './pompe_pif.html', './certificat_garantie.html', './certificat_garantie_pompe.html',
   './manifest.webmanifest', './apple-touch-icon.png', './icon-192.png', './icon-512.png',
   './logo-dominus.png', './certificat-pagina-1.jpg', './certificat-pagina-2.jpg'

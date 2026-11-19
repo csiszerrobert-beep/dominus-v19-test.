@@ -1,7 +1,9 @@
-DOMINUS V19.2 - TEST PDF WhatsApp
+DOMINUS V19.33.2 TEST - Corectie PDF fotografii iPhone
 
-Corectie: continutul formularului nu mai este randat in afara ecranului; verificare preventiva pentru PDF gol.
-
-TEST: incarca doar in dominus-v19-test; nu inlocui V18. Verifica PDF-ul in Descărcări inainte de trimitere.
-
-Atentie: salvarea si partajarea consecutive pot fi limitate de Android. Nu este garantat aspectul final al paginilor fara test pe telefon.
+Instaleaza DOAR in repository-ul dominus-v19-test.
+Pe iPhone, cand sunt fotografii atasate, butoanele PDF/Imprima folosesc generatorul PDF direct, nu imprimarea HTML Safari.
+Astfel fotografiile sunt atasate individual, cate una pe pagina, iar numarul lor este verificat.
+Apasa PDF, apoi Descarca PDF sau Salveaza si distribuie.
+Pe Android comportamentul ramane neschimbat.
+Testeaza 3 fotografii pe iPhone inainte de orice actualizare a aplicatiei principale.
+Nu sterge datele browserului.
