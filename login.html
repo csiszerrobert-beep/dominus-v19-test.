@@ -6,60 +6,122 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DOMINUS V20 – Autentificare</title>
 <style>
-body{margin:0;background:#eff4f9;color:#17324a;font:16px system-ui,sans-serif}
-main{max-width:850px;margin:7vh auto;padding:22px}
-.panel{background:white;border:1px solid #d8e2ed;border-radius:18px;padding:24px;box-shadow:0 10px 30px #18334d12}
-h1{margin-top:0}
-label{display:block;font-weight:600;margin-top:15px}
-input{box-sizing:border-box;width:100%;padding:13px;border:1px solid #b9c9d7;border-radius:9px;font:inherit}
-button{background:#174f79;color:white;border:0;border-radius:9px;padding:12px 17px;margin-top:15px;font:inherit;cursor:pointer}
-button:disabled{opacity:.5}
-.muted{color:#53687b}
-.error{color:#a52626;white-space:pre-wrap}
-.ok{color:#17613a}
-[hidden]{display:none!important}
+body {
+  margin: 0;
+  background: #eff4f9;
+  color: #17324a;
+  font: 16px system-ui,sans-serif;
+}
+main {
+  max-width: 850px;
+  margin: 7vh auto;
+  padding: 22px;
+}
+.panel {
+  background: white;
+  border: 1px solid #d8e2ed;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 10px 30px #18334d12;
+}
+h1 { margin-top: 0; }
+label {
+  display: block;
+  font-weight: 600;
+  margin-top: 15px;
+}
+input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #b9c9d7;
+  border-radius: 9px;
+  font: inherit;
+}
+button {
+  background: #174f79;
+  color: white;
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 17px;
+  margin-top: 15px;
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled { opacity: .5; }
+.muted { color: #53687b; }
+.error { color: #a52626; white-space: pre-wrap; }
+.ok { color: #17613a; }
+[hidden] { display: none !important; }
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="./dominus-config.js"></script>
 <script src="./dominus-auth.js"></script>
 </head>
+
 <body>
 <main>
 <div class="panel">
+
 <h1>DOMINUS V20 TEST</h1>
 <p class="muted">Autentificare ADMIN / TEHNICIAN</p>
 
 <form id="loginForm">
-<label>E-mail
-<input id="email" type="email" autocomplete="username" required>
-</label>
-<label>Parolă
-<input id="password" type="password" autocomplete="current-password" required>
-</label>
-<button id="loginButton" type="submit">Conectare</button>
+  <label>E-mail
+    <input id="email" type="email"
+      autocomplete="username" required>
+  </label>
+
+  <label>Parolă
+    <input id="password" type="password"
+      autocomplete="current-password" required>
+  </label>
+
+  <button id="loginButton" type="submit">
+    Conectare
+  </button>
 </form>
 
 <form id="activationForm" hidden>
-<h2>Activare cont tehnician</h2>
-<p>Stabilește parola pentru contul DOMINUS.</p>
-<label>Parolă nouă
-<input id="newPassword" type="password" autocomplete="new-password" minlength="12" required>
-</label>
-<label>Confirmă parola
-<input id="confirmPassword" type="password" autocomplete="new-password" minlength="12" required>
-</label>
-<button id="activateButton" type="submit">Activează contul</button>
+  <h2 id="activationTitle">Stabilește parola DOMINUS</h2>
+  <p>Introdu o parolă nouă pentru contul tău.</p>
+
+  <label>Parolă nouă
+    <input id="newPassword" type="password"
+      autocomplete="new-password"
+      minlength="12" required>
+  </label>
+
+  <label>Confirmă parola
+    <input id="confirmPassword" type="password"
+      autocomplete="new-password"
+      minlength="12" required>
+  </label>
+
+  <button id="activateButton" type="submit">
+    Salvează parola
+  </button>
 </form>
 
 <p id="message" role="status" aria-live="polite"></p>
-<p class="muted">Datele V19 rămân local în browser. Tehnicienii nu au acces la registrele vechi până la migrarea securizată.</p>
+
+<p class="muted">
+  Datele V19 rămân local în browser.
+  Tehnicienii nu au acces la registrele vechi
+  până la migrarea securizată.
+</p>
+
 </div>
 </main>
 
 <script>
 const $ = id => document.getElementById(id);
 const a = window.DominusAuth;
+
 let activationMode = false;
+let authCallback = false;
+let recoveryDetected = false;
 
 function message(text, error = false) {
   $('message').className = error ? 'error' : 'ok';
@@ -70,57 +132,102 @@ function showActivation() {
   activationMode = true;
   $('loginForm').hidden = true;
   $('activationForm').hidden = false;
-  message('Invitație detectată. Introdu o parolă nouă.');
+  message('Introdu și confirmă parola nouă.');
 }
 
 async function route() {
   const p = await a.profile();
+
   if (!p) return false;
-  location.replace(p.role === 'admin'
-    ? './admin.html'
-    : './tehnician.html');
+
+  if (p.role !== 'admin' && p.role !== 'technician') {
+    throw Error('Rolul contului nu este autorizat.');
+  }
+
+  location.replace(
+    p.role === 'admin'
+      ? './admin.html'
+      : './tehnician.html'
+  );
+
   return true;
 }
 
 async function initialize() {
-  if (!a.configured) {
+  if (!a.configured || !a.client) {
     message('Configurează cheia publică Supabase.', true);
     return;
   }
 
-  const hash = new URLSearchParams(location.hash.slice(1));
-  const query = new URLSearchParams(location.search);
-  const invitation = hash.get('type') === 'invite'
-    || query.get('type') === 'invite';
-  const recovery = hash.get('type') === 'recovery'
-    || query.get('type') === 'recovery';
+  const hash = new URLSearchParams(
+    location.hash.slice(1)
+  );
+  const query = new URLSearchParams(
+    location.search
+  );
+
+  const type = hash.get('type') || query.get('type');
+
+  const authError =
+    hash.get('error_description') ||
+    query.get('error_description') ||
+    hash.get('error') ||
+    query.get('error');
+
+  authCallback =
+    type === 'invite' ||
+    type === 'recovery' ||
+    hash.has('access_token') ||
+    query.has('code') ||
+    query.has('token_hash');
+
+  if (authError) {
+    history.replaceState(null, '', location.pathname);
+    message(authError, true);
+    return;
+  }
+
+  a.client.auth.onAuthStateChange(event => {
+    if (event === 'PASSWORD_RECOVERY') {
+      recoveryDetected = true;
+      showActivation();
+    }
+  });
 
   try {
-    // Permite bibliotecii Supabase să proceseze tokenurile
-    // din URL înainte de verificarea sesiunii.
-    const { data, error } = await a.client.auth.getSession();
+    const { data, error } =
+      await a.client.auth.getSession();
+
     if (error) throw error;
 
-    if (invitation || recovery) {
+    if (type === 'invite' || type === 'recovery') {
       if (!data.session) {
-        message('Linkul nu a creat o sesiune validă. Solicită un link nou.', true);
-        return;
+        throw Error(
+          'Linkul nu a creat o sesiune validă. Solicită un link nou.'
+        );
       }
+
       showActivation();
       return;
     }
 
-    if (query.get('error') || hash.get('error')) {
+    if (authCallback) {
+      if (recoveryDetected && data.session) {
+        showActivation();
+        return;
+      }
+
       message(
-        query.get('error_description')
-        || hash.get('error_description')
-        || 'Link de autentificare invalid sau expirat.',
+        'Se verifică linkul. Dacă formularul de parolă nu apare, solicită un link nou.',
         true
       );
       return;
     }
 
-    if (data.session) await route();
+    if (data.session) {
+      await route();
+    }
+
   } catch (e) {
     message(e.message, true);
   }
@@ -128,21 +235,30 @@ async function initialize() {
 
 $('loginForm').addEventListener('submit', async e => {
   e.preventDefault();
+
   $('loginButton').disabled = true;
   message('Se verifică autentificarea…');
 
   try {
-    const { error } = await a.client.auth.signInWithPassword({
-      email: $('email').value.trim(),
-      password: $('password').value
-    });
+    if (!a.client) {
+      throw Error('Supabase nu este configurat.');
+    }
+
+    const { error } =
+      await a.client.auth.signInWithPassword({
+        email: $('email').value.trim(),
+        password: $('password').value
+      });
 
     if (error) throw error;
 
     if (!await route()) {
       await a.client.auth.signOut();
-      throw Error('Cont inactiv sau profil indisponibil.');
+      throw Error(
+        'Cont inactiv sau profil indisponibil.'
+      );
     }
+
   } catch (e) {
     message(e.message, true);
   } finally {
@@ -150,49 +266,71 @@ $('loginForm').addEventListener('submit', async e => {
   }
 });
 
-$('activationForm').addEventListener('submit', async e => {
-  e.preventDefault();
+$('activationForm').addEventListener(
+  'submit',
+  async e => {
+    e.preventDefault();
 
-  if (!activationMode) return;
+    if (!activationMode) return;
 
-  const password = $('newPassword').value;
+    const password = $('newPassword').value;
+    const confirm = $('confirmPassword').value;
 
-  if (password !== $('confirmPassword').value) {
-    message('Parolele nu coincid.', true);
-    return;
-  }
-
-  if (password.length < 12) {
-    message('Parola trebuie să aibă minimum 12 caractere.', true);
-    return;
-  }
-
-  $('activateButton').disabled = true;
-
-  try {
-    const { data: sessionData } = await a.client.auth.getSession();
-
-    if (!sessionData.session) {
-      throw Error('Sesiunea invitației a expirat.');
+    if (password !== confirm) {
+      message('Parolele nu coincid.', true);
+      return;
     }
 
-    const { error } = await a.client.auth.updateUser({ password });
-    if (error) throw error;
-
-    // Elimină tokenurile din bara de adrese.
-    history.replaceState(null, '', location.pathname);
-
-    message('Parola a fost salvată. Se verifică profilul…');
-
-    if (!await route()) {
-      throw Error('Parola a fost salvată, dar profilul nu este activ sau nu poate fi accesat. Contactează administratorul.');
+    if (password.length < 12) {
+      message(
+        'Parola trebuie să aibă minimum 12 caractere.',
+        true
+      );
+      return;
     }
-  } catch (e) {
-    message(e.message, true);
-  } finally {
-    $('activateButton').disabled = false;
+
+    $('activateButton').disabled = true;
+
+    try {
+      const { data, error: sessionError } =
+        await a.client.auth.getSession();
+
+      if (sessionError || !data.session) {
+        throw Error(
+          'Sesiunea a expirat. Solicită un link nou.'
+        );
+      }
+
+      const { error } =
+        await a.client.auth.updateUser({
+          password
+        });
+
+      if (error) throw error;
+
+      history.replaceState(
+        null,
+        '',
+        location.pathname
+      );
+
+      message(
+        'Parola a fost salvată. Se verifică profilul…'
+      );
+
+      if (!await route()) {
+        throw Error(
+          'Parola a fost salvată, dar profilul nu este activ sau accesibil.'
+        );
+      }
+
+    } catch (e) {
+      message(e.message, true);
+    } finally {
+      $('activateButton').disabled = false;
+    }
   }
-});
+);
 
 initialize();
 </script>
