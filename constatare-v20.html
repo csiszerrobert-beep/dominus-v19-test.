@@ -52,9 +52,9 @@ body{padding-bottom:80px!important}@media print{body{padding-bottom:0!important}
 @media print{.dominus-v17-bar,.dominus-v17-dialog,.dominus-v16-bar,.dominus-back-bottom,.dominus-bottom-actions,.dominus-bottom-nav{display:none!important}body{padding-bottom:0!important}}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="./dominus-config.js"></script><script src="./dominus-auth.js"></script><style id="dominus-v20-guard">html{visibility:hidden}</style><script>(async()=>{try{const p=await window.DominusAuth.profile();if(!p||!['admin','technician'].includes(p.role)){location.replace('./login.html');return;}document.getElementById('dominus-v20-guard')?.remove();}catch(e){location.replace('./login.html');}})();</script></head><body><header><div class="dominus-top-navigation"><a href="index.html">← Înapoi la formulare</a></div><div class="dominus-logo"><img src="./logo-dominus.png" alt="Dominus"></div><main style="padding:0"><h1>Raport de intervenție/constatare</h1></main></header><main><h1 class="print-title">Raport de intervenție/constatare</h1><p class="muted" id="status">Ciornă salvată local pe acest dispozitiv.</p><section id="v20-cloud-panel" class="no-print" style="border:2px solid #287fae">
 <h2>DOMINUS V20 TEST · Registru cloud</h2>
-<p class="muted">Ciorna locală V20 este separată de V19. Folosește „Salvează în Supabase” pentru salvare online. Fotografiile se includ în PDF, dar nu sunt încă stocate în cloud. Semnăturile sunt incluse în datele raportului.</p>
+<p class="muted">Ciorna locală V20 este separată de V19. Salvarea online se face automat când apeși Salvare, PDF, E-mail sau WhatsApp. Fotografiile se includ în PDF, dar nu sunt încă stocate în cloud. Semnăturile sunt incluse în datele raportului.</p>
 <p id="v20-cloud-status" role="status">Se verifică sesiunea...</p>
-<div class="actions"><button type="button" id="v20-cloud-new">Raport cloud nou</button><button type="button" id="v20-cloud-save">Salvează în Supabase</button><button type="button" id="v20-cloud-refresh">Actualizează lista</button></div>
+<div class="actions"><button type="button" id="v20-cloud-new">Raport cloud nou</button><button type="button" id="v20-cloud-refresh">Actualizează lista</button></div>
 <label for="v20-cloud-list">Rapoarte disponibile în cont</label><select id="v20-cloud-list" style="width:100%;padding:12px"><option value="">Raport nou (nesalvat în cloud)</option></select>
 <button type="button" id="v20-cloud-open" style="margin-top:10px">Deschide raportul selectat</button>
 </section><form id="form"><section><h2>1. Date raport și firmă</h2><div class="grid"><div><label>Număr raport</label><input name="constatare_Da_0" type="text"/></div><div><label>Data</label><input name="constatare_Da_1" type="date"/></div><div><label>Denumire firmă</label><input name="constatare_Da_2" type="text"/></div><div><label>Adresă firmă</label><input name="constatare_Da_3" type="text"/></div><div><label>Tehnician</label><input name="constatare_Da_4" type="text"/></div><div><label>Telefon tehnician</label><input name="constatare_Da_5" type="tel" inputmode="numeric" autocomplete="tel"/></div></div></section><section><h2>2. Beneficiar și echipament</h2><div class="grid"><div><label>Beneficiar</label><input name="constatare_Be_0" type="text"/></div><div><label>Telefon beneficiar</label><input name="constatare_Be_1" type="tel" inputmode="numeric" autocomplete="tel"/></div><div><label>E-mail beneficiar</label><input name="constatare_Be_2" type="email"/></div><div><label>Adresă beneficiar</label><input name="constatare_Be_3" type="text"/></div><div><label>Loc intervenție</label><input name="constatare_Be_4" type="text"/></div><div><label>Marcă</label><input name="constatare_Be_5" type="text"/></div><div><label>Model</label><input name="constatare_Be_6" type="text"/></div><div><label>Serie echipament</label><input name="constatare_Be_7" type="text"/></div><div><label>Data achiziției</label><input name="constatare_Be_8" type="date"/></div></div></section><section><h2>3. Constatare tehnică</h2><div class="grid"><div><label>Simptome raportate</label><textarea name="constatare_Co_0"></textarea></div><div><label>Data verificării</label><input name="constatare_Co_1" type="date"/></div><div><label>Verificări efectuate</label><textarea name="constatare_Co_2"></textarea></div><div><label>Valori măsurate</label><textarea name="constatare_Co_3"></textarea></div><div><label>Defecțiune constatată</label><textarea name="constatare_Co_4"></textarea></div><div><label>Cauză probabilă</label><textarea name="constatare_Co_5"></textarea></div></div></section><section><h2>4. Rezultat și recomandări</h2><div class="grid"><div><label>Intervenție efectuată</label><textarea name="constatare_Re_0"></textarea></div><div><label>Piese / materiale</label><textarea name="constatare_Re_1"></textarea></div><div><label>Recomandări</label><textarea name="constatare_Re_2"></textarea></div><div><label>Necesită intervenție suplimentară</label><fieldset><label><input name="constatare_Re_3" type="radio" value="DA"/> DA</label><label><input name="constatare_Re_3" type="radio" value="NU"/> NU</label></fieldset></div><div><label>Echipament funcțional</label><fieldset><label><input name="constatare_Re_4" type="radio" value="DA"/> DA</label><label><input name="constatare_Re_4" type="radio" value="NU"/> NU</label></fieldset></div><div><label>Fotografii anexate</label><fieldset><label><input name="constatare_Re_5" type="radio" value="DA"/> DA</label><label><input name="constatare_Re_5" type="radio" value="NU"/> NU</label></fieldset></div></div></section><section><h2>5. Semnături</h2><div class="grid"><div><label>Nume beneficiar</label><input name="nume_beneficiar"/><label>Semnătură beneficiar</label><canvas class="sig" height="220" id="sig1" width="600"></canvas><button class="no-print" onclick="clearSig('sig1')" type="button">Șterge</button></div><div><label>Nume tehnician / persoană preluare</label><input name="nume_tehnician"/><label>Semnătură tehnician / primire</label><canvas class="sig" height="220" id="sig2" width="600"></canvas><button class="no-print" onclick="clearSig('sig2')" type="button">Șterge</button></div></div></section><p class="warning">Constatările și concluziile se completează numai după verificarea efectivă de către personalul tehnic.</p></form><section class="dominus-photos no-print" id="dominus-photo-controls">
@@ -72,7 +72,7 @@ body{padding-bottom:80px!important}@media print{body{padding-bottom:0!important}
   <h2>Anexă foto – Raport de intervenție / constatare</h2>
   <div id="dominus-photo-pages"></div>
 </section>
-<div class="actions"><button onclick="save()">Salvează</button><button onclick="save();window.print()">Generează PDF / Imprimă</button><button onclick="email()">Pregătește e-mail</button><button onclick="resetReport()">Formular nou</button></div><p class="muted">Versiune de test: PDF-ul se salvează din dialogul „Imprimă / Salvează ca PDF”. Pentru e-mail, atașează PDF-ul manual. Datele sunt păstrate doar în browserul acestui dispozitiv; nu există backup sau sincronizare între telefoane. Nu folosi dispozitive partajate pentru date personale.</p></main><script>const form=document.getElementById('form'),key='dominus_v20_constatare_draft';let timer;function capture(){let d={};new FormData(form).forEach((v,k)=>d[k]=v);for(let id of ['sig1','sig2'])d[id]=document.getElementById(id).toDataURL();return d}function save(){try{localStorage.setItem(key,JSON.stringify(capture()));document.getElementById('status').textContent='Salvat local: '+new Date().toLocaleTimeString('ro-RO')}catch(e){document.getElementById('status').textContent='Salvare eșuată (spațiu insuficient)'}}function restore(){try{let d=JSON.parse(localStorage.getItem(key)||'null');if(!d)return;for(let [k,v] of Object.entries(d)){if(k==='sig1'||k==='sig2'){let img=new Image();img.onload=()=>document.getElementById(k).getContext('2d').drawImage(img,0,0);img.src=v;continue}let el=[...form.elements].find(x=>x.name===k&&(x.type!=='radio'||x.value===v));if(el){if(el.type==='radio')el.checked=true;else el.value=v}}}catch(e){}}function sig(id){let c=document.getElementById(id),ctx=c.getContext('2d'),drawing=false;ctx.lineWidth=3;ctx.lineCap='round';function xy(e){let r=c.getBoundingClientRect();return [(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]}c.addEventListener('pointerdown',e=>{drawing=true;c.setPointerCapture(e.pointerId);let [x,y]=xy(e);ctx.beginPath();ctx.moveTo(x,y)});c.addEventListener('pointermove',e=>{if(!drawing)return;let [x,y]=xy(e);ctx.lineTo(x,y);ctx.stroke()});c.addEventListener('pointerup',()=>{drawing=false;save()});c.addEventListener('pointercancel',()=>drawing=false)}function clearSig(id){let c=document.getElementById(id);c.getContext('2d').clearRect(0,0,c.width,c.height);save()}form.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(save,600)});form.addEventListener('change',()=>{clearTimeout(timer);timer=setTimeout(save,300)});sig('sig1');sig('sig2');restore();function resetReport(){if(!confirm('Ștergi ciorna acestui formular?'))return;window.dominusClientNewDocument?.();form.reset();for(let id of ['sig1','sig2'])clearSig(id);localStorage.removeItem(key)}function email(){save();let d=capture(),to=(d['constatare_DUMMY']||'');let recipient=[...form.elements].find(e=>e.type==='email')?.value||'';let subject=document.title;let body='Bună ziua,%0A%0AVă rog să găsiți raportul PDF atașat.%0A%0AIMPORTANT: salvați mai întâi raportul ca PDF și atașați-l manual înainte de trimitere.';location.href='mailto:'+encodeURIComponent(recipient)+'?subject='+encodeURIComponent(subject)+'&body='+body}</script><script>if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')) {window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('Offline indisponibil:',err)));}</script><script id="v15-inputs-script">
+<div class="actions"><button type="button" onclick="dominusV17Save()">Salvează</button><button type="button" onclick="dominusV17Print()">Generează PDF / Imprimă</button><button type="button" onclick="dominusV17Email()">Pregătește e-mail</button><button type="button" onclick="resetReport()">Formular nou</button></div><p class="muted">Versiune de test: PDF-ul se salvează din dialogul „Imprimă / Salvează ca PDF”. Pentru e-mail, atașează PDF-ul manual. Ciorna este păstrată local; la apăsarea Salvare, PDF, E-mail sau WhatsApp se încearcă și salvarea online. Nu folosi dispozitive partajate pentru date personale.</p></main><script>const form=document.getElementById('form'),key='dominus_v20_constatare_draft';let timer;function capture(){let d={};new FormData(form).forEach((v,k)=>d[k]=v);for(let id of ['sig1','sig2'])d[id]=document.getElementById(id).toDataURL();return d}function save(){try{localStorage.setItem(key,JSON.stringify(capture()));document.getElementById('status').textContent='Salvat local: '+new Date().toLocaleTimeString('ro-RO')}catch(e){document.getElementById('status').textContent='Salvare eșuată (spațiu insuficient)'}}function restore(){try{let d=JSON.parse(localStorage.getItem(key)||'null');if(!d)return;for(let [k,v] of Object.entries(d)){if(k==='sig1'||k==='sig2'){let img=new Image();img.onload=()=>document.getElementById(k).getContext('2d').drawImage(img,0,0);img.src=v;continue}let el=[...form.elements].find(x=>x.name===k&&(x.type!=='radio'||x.value===v));if(el){if(el.type==='radio')el.checked=true;else el.value=v}}}catch(e){}}function sig(id){let c=document.getElementById(id),ctx=c.getContext('2d'),drawing=false;ctx.lineWidth=3;ctx.lineCap='round';function xy(e){let r=c.getBoundingClientRect();return [(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]}c.addEventListener('pointerdown',e=>{drawing=true;c.setPointerCapture(e.pointerId);let [x,y]=xy(e);ctx.beginPath();ctx.moveTo(x,y)});c.addEventListener('pointermove',e=>{if(!drawing)return;let [x,y]=xy(e);ctx.lineTo(x,y);ctx.stroke()});c.addEventListener('pointerup',()=>{drawing=false;save()});c.addEventListener('pointercancel',()=>drawing=false)}function clearSig(id){let c=document.getElementById(id);c.getContext('2d').clearRect(0,0,c.width,c.height);save()}form.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(save,600)});form.addEventListener('change',()=>{clearTimeout(timer);timer=setTimeout(save,300)});sig('sig1');sig('sig2');restore();function resetReport(){if(!confirm('Ștergi ciorna acestui formular?'))return;window.dominusClientNewDocument?.();form.reset();for(let id of ['sig1','sig2'])clearSig(id);localStorage.removeItem(key)}function email(){save();let d=capture(),to=(d['constatare_DUMMY']||'');let recipient=[...form.elements].find(e=>e.type==='email')?.value||'';let subject=document.title;let body='Bună ziua,%0A%0AVă rog să găsiți raportul PDF atașat.%0A%0AIMPORTANT: salvați mai întâi raportul ca PDF și atașați-l manual înainte de trimitere.';location.href='mailto:'+encodeURIComponent(recipient)+'?subject='+encodeURIComponent(subject)+'&body='+body}</script><script>if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')) {window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('Offline indisponibil:',err)));}</script><script id="v15-inputs-script">
 (function(){
 function prepare(){
  document.querySelectorAll('input[type="date"]').forEach(function(inp){
@@ -105,7 +105,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   },true);
 })();
 </script>
-<div class="dominus-bottom-actions" aria-label="Acțiuni la finalul formularului"><button type="button" onclick="window.print()">🖨️ Imprimă / Salvează PDF</button><button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Sus</button><a href="index.html">← Înapoi la meniu</a></div><script id="dominus-photos-script">
+<div class="dominus-bottom-actions" aria-label="Acțiuni la finalul formularului"><button type="button" onclick="dominusV17Print()">🖨️ Imprimă / Salvează PDF</button><button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Sus</button><a href="index.html">← Înapoi la meniu</a></div><script id="dominus-photos-script">
 (function(){
   const photos=[];
   const camera=document.getElementById('dominus-camera');
@@ -378,7 +378,7 @@ window.dominusWhatsApp=async function(){
 'use strict';
 const cloudStatus=document.getElementById('v20-cloud-status');
 const list=document.getElementById('v20-cloud-list');
-const btnSave=document.getElementById('v20-cloud-save');
+
 const btnOpen=document.getElementById('v20-cloud-open');
 const btnRefresh=document.getElementById('v20-cloud-refresh');
 const btnNew=document.getElementById('v20-cloud-new');
@@ -386,7 +386,7 @@ const auth=window.DominusAuth;
 const db=auth?.client;
 let currentId=null, currentUpdatedAt=null, user=null, profile=null;
 function message(t){cloudStatus.textContent=t;}
-function busy(on){btnSave.disabled=btnOpen.disabled=btnRefresh.disabled=btnNew.disabled=on;}
+function busy(on){btnOpen.disabled=btnRefresh.disabled=btnNew.disabled=on;}
 function getData(){return capture();}
 function applyData(d){
   form.reset();
@@ -427,7 +427,13 @@ async function refresh(){
   list.value=currentId||'';
   message('Conectat: '+(profile.full_name||profile.email||profile.role)+' · '+(data||[]).length+' rapoarte afișate (maxim 100).');
 }
+let savingPromise=null;
 async function saveCloud(){
+  if(savingPromise)return savingPromise;
+  savingPromise=performCloudSave();
+  try{return await savingPromise;}finally{savingPromise=null;}
+}
+async function performCloudSave(){
   busy(true);
   try{
     await ensureAuth();
@@ -452,9 +458,11 @@ async function saveCloud(){
     currentId=result.data[0].id;
     currentUpdatedAt=result.data[0].updated_at;
     save();
-    await refresh();
-    message('Salvat în Supabase cu succes · '+new Date().toLocaleTimeString('ro-RO')+' · ID: '+currentId);
-  }catch(e){message('Salvare cloud eșuată: '+e.message);alert('Nu s-a confirmat salvarea în Supabase: '+e.message);}
+    message('Salvat online · '+new Date().toLocaleTimeString('ro-RO')+' · ID: '+currentId);
+    try{await refresh();}catch(refreshError){console.warn('Lista nu s-a actualizat:',refreshError);}
+    message('Salvat online · '+new Date().toLocaleTimeString('ro-RO')+' · ID: '+currentId);
+    return true;
+  }catch(e){message('Raportul NU a fost salvat online: '+e.message);alert('Raportul NU a fost salvat online. Ciorna locală rămâne disponibilă.\n'+e.message);return false;}
   finally{busy(false);}
 }
 async function openCloud(){
@@ -472,7 +480,7 @@ async function openCloud(){
   }catch(e){message('Deschidere eșuată: '+e.message);}
   finally{busy(false);}
 }
-btnSave.addEventListener('click',saveCloud);
+
 btnOpen.addEventListener('click',openCloud);
 btnRefresh.addEventListener('click',async()=>{busy(true);try{await refresh();}catch(e){message('Eroare: '+e.message);}finally{busy(false);}});
 btnNew.addEventListener('click',()=>{
@@ -482,11 +490,30 @@ btnNew.addEventListener('click',()=>{
   for(const id of ['sig1','sig2']){const c=document.getElementById(id);c.getContext('2d').clearRect(0,0,c.width,c.height);}
   localStorage.removeItem('dominus_v20_constatare_draft');
   window.dominusClientNewDocument?.();
-  list.value='';message('Raport nou. Completează formularul și apasă „Salvează în Supabase”.');
+  list.value='';message('Raport nou. Completează formularul și apasă „Salvare”.');
 });
 // Existing V19 reset button should never reuse the cloud record ID.
 const oldReset=window.resetReport;
 window.resetReport=function(){const before=localStorage.getItem('dominus_v20_constatare_draft');oldReset();if(before!==null && localStorage.getItem('dominus_v20_constatare_draft')===null){currentId=null;currentUpdatedAt=null;list.value='';}};
+// Toate acțiunile utilizatorului salvează online înainte de continuare.
+const originalWhatsApp=window.dominusWhatsApp;
+let actionInProgress=false;
+async function runAfterCloud(action){
+  if(actionInProgress)return;
+  actionInProgress=true;
+  try{
+    // O copie locală rămâne disponibilă și dacă internetul cade.
+    save();
+    const ok=await saveCloud();
+    if(!ok)return;
+    if(action)await action();
+  }finally{actionInProgress=false;}
+}
+window.dominusV17Save=()=>runAfterCloud(null);
+window.dominusV17Print=()=>runAfterCloud(()=>window.print());
+window.dominusV17Email=()=>runAfterCloud(()=>email());
+window.dominusWhatsApp=()=>runAfterCloud(()=>originalWhatsApp());
+// Prevenim folosirea unui ID vechi când utilizatorul schimbă raportul din listă.
 refresh().catch(e=>message('Conectare cloud indisponibilă: '+e.message));
 })();
 </script></body></html>
