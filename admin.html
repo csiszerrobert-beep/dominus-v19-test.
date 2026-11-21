@@ -1,171 +1,52 @@
 <!doctype html>
 <html lang="ro">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DOMINUS V20 – ADMIN</title>
 <style>
-:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#eff4f9;color:#17324a;font:16px system-ui,sans-serif}main{max-width:1100px;margin:4vh auto;padding:20px}.panel{background:white;border:1px solid #d8e2ed;border-radius:18px;padding:25px;box-shadow:0 10px 30px #18334d12}h1{margin:0 0 12px}h2{margin:34px 0 12px}h3{margin:0 0 10px}label{display:block;font-weight:600;margin-top:15px}input{width:100%;padding:13px;border:1px solid #b9c9d7;border-radius:9px;font:inherit}button,.link{display:inline-block;background:#174f79;color:white;border:0;border-radius:9px;padding:12px 17px;margin:12px 7px 0 0;font:inherit;cursor:pointer;text-decoration:none}button:disabled{opacity:.5;cursor:wait}.secondary{background:#dce9f4;color:#17324a}.muted{color:#53687b}.error{color:#a52626;white-space:pre-wrap}.ok{color:#17613a}.entry{border-top:1px solid #d8e2ed;padding:16px 0}.actions{display:flex;flex-wrap:wrap;gap:5px}.actions button{font-size:13px;margin:5px 0}#message,#reports-message{min-height:25px}.report-card{border:1px solid #d8e2ed;border-radius:14px;padding:19px;margin:14px 0;background:#f9fbfd}.report-card strong{overflow-wrap:anywhere}.report-card p{margin:7px 0}.report-details{margin-top:15px;border-top:1px solid #d8e2ed;padding-top:16px}.report-details pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf3f9;padding:12px;border-radius:8px;max-height:350px;overflow:auto}.note{border-left:4px solid #174f79;padding:10px 13px;background:#f1f6fb}.hidden{display:none}.report-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.data-box{background:#fff;border:1px solid #dbe5ef;border-radius:10px;padding:12px;min-width:0}.data-label{font-size:13px;font-weight:700;color:#53687b;margin-bottom:6px;overflow-wrap:anywhere}.data-value{white-space:pre-wrap;overflow-wrap:anywhere}.report-section{margin:20px 0;padding:15px;border:1px solid #d8e2ed;border-radius:12px;background:#f3f7fb}.report-section>.report-grid{margin-top:12px}.report-section h4{margin:0}.signature{max-width:100%;max-height:220px;object-fit:contain;background:#fff;border:1px solid #d8e2ed;border-radius:7px;padding:7px}.report-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}.report-top p{margin:5px 0}.report-actions{display:flex;gap:8px;flex-wrap:wrap}.report-actions button{margin:0}.technical{margin-top:20px}.technical summary{cursor:pointer;font-weight:600}.empty{font-style:italic;color:#53687b}@media(max-width:650px){main{padding:9px}.panel{padding:15px}h1{font-size:26px}.report-grid{grid-template-columns:1fr}}
+:root{font-family:system-ui,sans-serif;color:#17324a;background:#eff4f9}*{box-sizing:border-box}body{margin:0}main{max-width:1150px;margin:35px auto;padding:18px}.panel{background:#fff;border:1px solid #d8e2ed;border-radius:18px;padding:clamp(16px,3vw,30px);box-shadow:0 10px 30px #18334d12}h1{margin:0 0 12px}h2{margin:30px 0 8px}h3{margin:15px 0 10px}p{line-height:1.5}label{display:block;font-weight:600;margin-top:15px}input,select{width:100%;padding:12px;border:1px solid #b9c9d7;border-radius:9px;font:inherit;background:white;color:inherit}button,.link{display:inline-block;background:#174f79;color:white;border:0;border-radius:9px;padding:12px 17px;margin:10px 7px 0 0;font:inherit;cursor:pointer;text-decoration:none}button:disabled{opacity:.5;cursor:wait}.secondary{background:#dce9f4;color:#17324a}.muted{color:#53687b}.error{color:#a52626;white-space:pre-wrap}.ok{color:#17613a}.entry{border-top:1px solid #d8e2ed;padding:16px 0}.actions{display:flex;flex-wrap:wrap;gap:5px}.actions button{font-size:13px;margin:5px 0}#message,#reports-message{min-height:24px}.hidden{display:none!important}.report-card{border:1px solid #d8e2ed;border-radius:12px;padding:16px;margin:10px 0;background:#f9fbfd}.report-card p{margin:7px 0}.report-details{margin-top:12px;border-top:1px solid #d8e2ed;padding-top:12px}.report-details dl{margin:0}.report-details dt{font-weight:700;margin-top:12px}.report-details dd{margin:3px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}.report-details pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf3f9;padding:12px;border-radius:8px;max-height:300px;overflow:auto}.note{border-left:4px solid #174f79;padding:10px 13px;background:#f1f6fb}.controls{display:grid;grid-template-columns:1fr 1fr;gap:14px}.controls label{margin:0}.category{border:1px solid #b9c9d7;border-radius:12px;padding:15px;background:#f4f8fc;margin:16px 0}.category strong{font-size:18px}.field-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.field{border:1px solid #d8e2ed;border-radius:10px;padding:12px;background:white;min-width:0}.field-name{font-size:13px;font-weight:700;color:#53687b;margin-bottom:6px}.field-value{white-space:pre-wrap;overflow-wrap:anywhere}.signature{display:block;max-width:100%;max-height:170px;object-fit:contain;border:1px solid #d8e2ed;border-radius:7px;background:white}.section-head{font-weight:700;margin:18px 0 10px}.small{font-size:13px}.count{color:#53687b;font-size:14px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.toolbar label{flex:1;min-width:220px}.empty{padding:20px;border:1px dashed #b9c9d7;border-radius:12px;color:#53687b}@media(max-width:650px){.controls{grid-template-columns:1fr}main{margin:0;padding:9px}.panel{border-radius:10px}button,.link{max-width:100%}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="./dominus-config.js"></script>
-<script src="./dominus-auth.js"></script>
+<script src="./dominus-config.js"></script><script src="./dominus-auth.js"></script>
 </head>
-<body>
-<main><div class="panel">
-<h1>DOMINUS V20 · ADMIN</h1>
-<p id="who" class="muted">Verificare cont…</p>
-<button class="secondary" onclick="DominusAuth.signOut()">Deconectare</button>
-<a class="link secondary" href="./index.html">Formularele V19 (doar ADMIN)</a>
+<body><main><div class="panel">
+<h1>DOMINUS V20 · ADMIN</h1><p id="who" class="muted">Verificare cont…</p>
+<button class="secondary" onclick="DominusAuth.signOut()">Deconectare</button><a class="link secondary" href="./index.html">Formularele V19 (doar ADMIN)</a>
 <div id="admin-content" class="hidden">
 <section aria-labelledby="reports-heading">
-<h2 id="reports-heading">Rapoarte CONSTATARE V20</h2>
-<p class="muted">Rapoarte din Supabase, în mod consultare. Nu se modifică și nu se șterg înregistrările.</p>
-<button id="reports-refresh" type="button">Actualizează rapoartele</button>
-<p id="reports-message" role="status"></p>
-<div id="reports-list"></div>
-<p class="note">Semnăturile salvate ca imagini pot fi afișate. Fotografiile care nu au fost încărcate în Supabase nu pot fi recuperate de aici.</p>
+<h2 id="reports-heading">Rapoarte pe tehnicieni și categorii</h2>
+<p class="muted">Consultă toate rapoartele salvate în Supabase, inclusiv cele în lucru. Nu se modifică și nu se șterge niciun raport.</p>
+<div class="controls"><label for="technician-filter">1. Selectează tehnicianul<select id="technician-filter"><option value="all">Toți tehnicienii</option></select></label><label for="category-filter">2. Selectează categoria<select id="category-filter"><option value="constatari">CONSTATARE V20</option></select></label></div>
+<div class="category"><strong>📋 CONSTATARE V20</strong><p class="muted small">Alte categorii vor apărea aici după conectarea lor la Supabase.</p></div>
+<div class="toolbar"><label for="report-search">3. Caută raportul<input id="report-search" type="search" placeholder="Număr raport, client, firmă, dată…"></label><button id="reports-refresh" type="button">Actualizează rapoartele</button></div>
+<p id="reports-message" role="status"></p><div id="reports-list"></div>
+<p class="note">Fotografiile nu sunt încă stocate în cloud. Semnăturile pot fi afișate dacă există în datele raportului. Starea „În lucru / Finalizat” va fi implementată separat; deocamdată afișăm toate rapoartele salvate.</p>
 </section>
-<h2>Invită tehnician</h2>
-<form id="invite"><label>Nume complet<input id="name" maxlength="150" required></label><label>E-mail<input id="email" type="email" required></label><label>Telefon<input id="phone" maxlength="40"></label><button type="submit">Trimite invitație</button></form>
-<p id="message" role="status"></p>
-<h2>Tehnicieni</h2><button id="refresh" class="secondary" type="button">Actualizează lista</button><div id="list"></div>
+<h2>Invită tehnician</h2><form id="invite"><label>Nume complet<input id="name" maxlength="150" required></label><label>E-mail<input id="email" type="email" required></label><label>Telefon<input id="phone" maxlength="40"></label><button type="submit">Trimite invitație</button></form><p id="message" role="status"></p>
+<h2>Administrare tehnicieni</h2><button id="refresh" class="secondary" type="button">Actualizează lista</button><div id="list"></div>
 </div></div></main>
 <script>
 'use strict';
 const $=id=>document.getElementById(id),a=DominusAuth;
-let profile=null;
+let profile=null,technicians=[],reports=[];
 function status(t,bad=false){$('message').className=bad?'error':'ok';$('message').textContent=t;}
 function reportsStatus(t,bad=false){$('reports-message').className=bad?'error':'ok';$('reports-message').textContent=t;}
-async function invoke(body){
- const {data:{session},error:se}=await a.client.auth.getSession();
- if(se||!session)throw Error('Sesiune expirată. Conectează-te din nou.');
- const res=await fetch(window.DOMINUS_CONFIG.url+'/functions/v1/admin-users',{
-  method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token,'apikey':window.DOMINUS_CONFIG.publishableKey},body:JSON.stringify(body)
- });
- const result=await res.json().catch(()=>({}));
- if(!res.ok)throw Error(result.error||'Eroare '+res.status);
- return result;
-}
-async function load(){
- try{
-  const {technicians=[]}=await invoke({action:'list'}),list=$('list');list.replaceChildren();
-  if(!technicians.length){list.textContent='Niciun tehnician.';return;}
-  for(const t of technicians){
-   const wrap=document.createElement('div');wrap.className='entry';
-   const title=document.createElement('strong');title.textContent=t.full_name+' · '+(t.active?'Activ':'Dezactivat');wrap.append(title);
-   const info=document.createElement('p');info.textContent=(t.email||'')+' · '+(t.phone||'');wrap.append(info);
-   const actions=document.createElement('div');actions.className='actions';
-   for(const [label,fn] of [
-    ['Editează',async()=>{const full_name=prompt('Nume complet',t.full_name);if(full_name===null)return;const email=prompt('E-mail',t.email||'');if(email===null)return;const phone=prompt('Telefon',t.phone||'');if(phone===null)return;await invoke({action:'update',id:t.id,full_name,email,phone});}],
-    [t.active?'Dezactivează':'Reactivează',async()=>{if(!confirm('Confirmi modificarea stării contului?'))return;await invoke({action:'set_active',id:t.id,active:!t.active});}],
-    ['Resetare parolă',async()=>{if(!confirm('Trimitem e-mail de resetare?'))return;await invoke({action:'reset_password',id:t.id});}]
-   ]){
-    const b=document.createElement('button');b.type='button';b.textContent=label;b.className='secondary';
-    b.onclick=async()=>{b.disabled=true;try{await fn();status('Operațiune efectuată.');await load();}catch(e){status(e.message,true);}finally{b.disabled=false;}};actions.append(b);
-   }
-   wrap.append(actions);list.append(wrap);
-  }
- }catch(e){status(e.message||String(e),true);}
-}
-function str(value){if(value===null||value===undefined||value==='')return '—';if(typeof value==='object')return JSON.stringify(value,null,2);return String(value);}
-function pretty(key){
- const names={id:'ID unic',technician_id:'ID tehnician',report_number:'Număr raport',client_id:'ID client',equipment_id:'ID echipament',created_at:'Data creării',updated_at:'Ultima actualizare',sig1:'Semnătura 1',sig2:'Semnătura 2',sig3:'Semnătura 3',full_name:'Nume complet',client_name:'Nume client',equipment_name:'Echipament',report_date:'Data raportului',observations:'Observații',description:'Descriere',notes:'Note'};
- return names[key]||key.replace(/_/g,' ').replace(/([a-z])([A-Z])/g,'$1 $2').replace(/^./,s=>s.toUpperCase());
-}
-function isImageData(v){return typeof v==='string'&&/^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=\s]+$/i.test(v)&&v.length<3000000;}
-function isLongEncoded(v){return typeof v==='string'&&(v.length>800&&(/^(data:|[a-z0-9+/=]{800,})/i.test(v)));}
-function dateText(v){if(!v)return '—';const d=new Date(v);return Number.isNaN(d.getTime())?str(v):d.toLocaleString('ro-RO');}
-function box(label,value){
- const el=document.createElement('div');el.className='data-box';
- const heading=document.createElement('div');heading.className='data-label';heading.textContent=label;el.append(heading);
- if(isImageData(value)){
-  const img=document.createElement('img');img.className='signature';img.alt=label;img.loading='lazy';img.src=value;el.append(img);
- }else{
-  const val=document.createElement('div');val.className='data-value';val.textContent=isLongEncoded(value)?'[Date codificate – disponibile în secțiunea tehnică]':str(value);el.append(val);
- }
- return el;
-}
-function grid(items){const el=document.createElement('div');el.className='report-grid';for(const [label,value] of items)el.append(box(label,value));return el;}
-function renderData(obj,parent,depth=0){
- if(obj===null||obj===undefined){parent.append(box('Date','—'));return;}
- if(Array.isArray(obj)){
-  if(!obj.length){const p=document.createElement('p');p.className='empty';p.textContent='Nicio înregistrare.';parent.append(p);return;}
-  obj.forEach((item,i)=>{
-   if(item&&typeof item==='object'&&!isImageData(item)){
-    const section=document.createElement('section');section.className='report-section';const h=document.createElement('h4');h.textContent='Element '+(i+1);section.append(h);parent.append(section);renderData(item,section,depth+1);
-   }else parent.append(box('Element '+(i+1),item));
-  });return;
- }
- if(typeof obj!=='object'){parent.append(box('Valoare',obj));return;}
- const simple=[],nested=[];
- for(const [key,value] of Object.entries(obj)){
-  if(value&&typeof value==='object'&&!Array.isArray(value))nested.push([key,value]);
-  else if(Array.isArray(value))nested.push([key,value]);
-  else simple.push([pretty(key),value]);
- }
- if(simple.length)parent.append(grid(simple));
- for(const [key,value] of nested){
-  const section=document.createElement('section');section.className='report-section';
-  const h=document.createElement('h4');h.textContent=pretty(key);section.append(h);parent.append(section);
-  if(depth>=7){const p=document.createElement('p');p.className='muted';p.textContent='Structură complexă. Consultă datele tehnice de mai jos.';section.append(p);}
-  else renderData(value,section,depth+1);
- }
- if(!simple.length&&!nested.length){const p=document.createElement('p');p.className='empty';p.textContent='Nu există câmpuri completate.';parent.append(p);}
-}
-function displayReport(record,container){
- container.replaceChildren();
- const title=document.createElement('h3');title.textContent='Raport '+str(record.report_number);container.append(title);
- const overview=[['Număr raport',record.report_number],['Data creării',dateText(record.created_at)],['Ultima actualizare',dateText(record.updated_at)],['ID tehnician',record.technician_id],['ID client',record.client_id],['ID echipament',record.equipment_id],['ID raport',record.id]];
- container.append(grid(overview));
- const h=document.createElement('h3');h.style.marginTop='24px';h.textContent='Datele constatării';container.append(h);
- let reportData=record.report_data;
- if(typeof reportData==='string'){
-  try{reportData=JSON.parse(reportData);}catch(_){/* afișăm textul original */}
- }
- renderData(reportData,container);
- const more=document.createElement('details');more.className='technical';
- const summary=document.createElement('summary');summary.textContent='Vezi toate datele salvate (format tehnic)';
- const pre=document.createElement('pre');pre.textContent=JSON.stringify(record,null,2);more.append(summary,pre);container.append(more);
-}
-async function loadReports(){
- const button=$('reports-refresh');button.disabled=true;reportsStatus('Se încarcă rapoartele…');$('reports-list').replaceChildren();
- try{
-  const {data,error}=await a.client.from('dominus_v20_constatari').select('*').limit(100);
-  if(error)throw error;
-  const records=Array.isArray(data)?data:[];
-  records.sort((x,y)=>String(y.updated_at||y.created_at||'').localeCompare(String(x.updated_at||x.created_at||'')));
-  reportsStatus(records.length+' rapoarte afișate (maxim 100).');
-  if(!records.length){$('reports-list').textContent='Nu există rapoarte vizibile pentru acest cont.';return;}
-  for(const record of records){
-   const card=document.createElement('article');card.className='report-card';
-   const top=document.createElement('div');top.className='report-top';
-   const info=document.createElement('div');const title=document.createElement('strong');title.textContent=str(record.report_number);
-   const sub=document.createElement('p');sub.className='muted';sub.textContent='Creat: '+dateText(record.created_at)+' · Tehnician (ID): '+str(record.technician_id);
-   info.append(title,sub);top.append(info);
-   const actions=document.createElement('div');actions.className='report-actions';
-   const btn=document.createElement('button');btn.type='button';btn.className='secondary';btn.textContent='Vizualizează raportul';
-   const details=document.createElement('div');details.className='report-details hidden';
-   btn.onclick=()=>{const opening=details.classList.contains('hidden');details.classList.toggle('hidden',!opening);btn.textContent=opening?'Ascunde raportul':'Vizualizează raportul';if(opening)displayReport(record,details);};
-   actions.append(btn);top.append(actions);card.append(top,details);$('reports-list').append(card);
-  }
- }catch(e){reportsStatus('Nu am putut încărca rapoartele: '+(e.message||String(e)),true);}
- finally{button.disabled=false;}
-}
-(async()=>{
- if(!a.configured){location.replace('./login.html');return;}
- try{
-  profile=await a.profile();if(!profile||profile.role!=='admin'){location.replace('./login.html');return;}
-  $('who').textContent='Autentificat: '+profile.full_name;
-  $('admin-content').classList.remove('hidden');await Promise.all([load(),loadReports()]);
- }catch(e){$('who').textContent='Eroare la verificarea contului: '+(e.message||String(e));}
-})();
-$('refresh').onclick=load;$('reports-refresh').onclick=loadReports;
-$('invite').onsubmit=async e=>{
- e.preventDefault();const b=e.submitter;b.disabled=true;
- try{await invoke({action:'create',full_name:$('name').value.trim(),email:$('email').value.trim(),phone:$('phone').value.trim()||null});status('Invitația a fost solicitată. Verifică livrarea e-mailului.');$('invite').reset();await load();}
- catch(err){status(err.message||String(err),true);}finally{b.disabled=false;}
-};
-</script>
-</body>
-</html>
+async function invoke(body){const {data:{session},error:se}=await a.client.auth.getSession();if(se||!session)throw Error('Sesiune expirată. Conectează-te din nou.');const res=await fetch(window.DOMINUS_CONFIG.url+'/functions/v1/admin-users',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token,'apikey':window.DOMINUS_CONFIG.publishableKey},body:JSON.stringify(body)});const result=await res.json().catch(()=>({}));if(!res.ok)throw Error(result.error||'Eroare '+res.status);return result;}
+function text(value){if(value===null||value===undefined||value==='')return '—';if(typeof value==='object')return JSON.stringify(value,null,2);return String(value);}
+function readableKey(key){const aliases={sig1:'Semnătura 1',sig2:'Semnătura 2',technician_name:'Nume tehnician',report_number:'Număr raport',client_name:'Client',equipment_name:'Echipament',created_at:'Data creării',updated_at:'Ultima actualizare'};if(aliases[key])return aliases[key];return key.replace(/^constatare_/i,'').replace(/_/g,' ').replace(/([a-z])([A-Z])/g,'$1 $2').trim().replace(/^./,x=>x.toUpperCase());}
+function isSignature(key,value){return typeof value==='string'&&/^data:image\/(png|jpeg|jpg|webp);base64,/i.test(value)&&(/sig|semn|signature/i.test(key));}
+function addField(parent,key,value){if(value===null||value===undefined||value==='')return;const card=document.createElement('div');card.className='field';const name=document.createElement('div');name.className='field-name';name.textContent=readableKey(key);const val=document.createElement('div');val.className='field-value';if(isSignature(key,value)){const img=document.createElement('img');img.className='signature';img.alt=readableKey(key);img.src=value;val.append(img);}else if(typeof value==='string'&&value.startsWith('data:image/')){val.textContent='Imagine salvată în raport';}else{val.textContent=text(value);}card.append(name,val);parent.append(card);}
+function addObjectFields(parent,obj){const grid=document.createElement('div');grid.className='field-grid';for(const [key,value] of Object.entries(obj||{})){if(value===null||value===undefined||value==='')continue;if(Array.isArray(value)){if(!value.length)continue;const section=document.createElement('div');section.className='section-head';section.textContent=readableKey(key);parent.append(section);if(value.every(x=>x&&typeof x==='object'&&!Array.isArray(x))){value.forEach((x,i)=>{const title=document.createElement('p');title.className='small muted';title.textContent=readableKey(key)+' '+(i+1);parent.append(title);addObjectFields(parent,x);});}else{addField(parent,key,value);}continue;}if(value&&typeof value==='object'){const section=document.createElement('div');section.className='section-head';section.textContent=readableKey(key);parent.append(section);addObjectFields(parent,value);continue;}addField(grid,key,value);}if(grid.children.length)parent.append(grid);}
+function formatDate(value){if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString('ro-RO');}
+function reportData(r){return r.report_data&&typeof r.report_data==='object'?r.report_data:{};}
+function technicianName(id){const t=technicians.find(x=>x.id===id);return t?.full_name||'Tehnician '+String(id||'necunoscut').slice(0,8);}
+function displayReport(record,container){container.replaceChildren();const heading=document.createElement('h3');heading.textContent='Datele raportului';container.append(heading);const meta=document.createElement('div');meta.className='field-grid';for(const [key,val] of [['Număr raport',record.report_number],['Tehnician',technicianName(record.technician_id)],['Data creării',formatDate(record.created_at)],['Ultima actualizare',formatDate(record.updated_at)],['ID raport',record.id]]){const box=document.createElement('div');box.className='field';const title=document.createElement('div');title.className='field-name';title.textContent=key;const v=document.createElement('div');v.className='field-value';v.textContent=text(val);box.append(title,v);meta.append(box);}container.append(meta);const section=document.createElement('h3');section.textContent='Datele constatării';container.append(section);const data=reportData(record);if(Object.keys(data).length)addObjectFields(container,data);else{const p=document.createElement('p');p.textContent='Nu există date suplimentare în report_data.';container.append(p);}const more=document.createElement('details');more.style.marginTop='18px';const summary=document.createElement('summary');summary.textContent='Vezi toate datele salvate (format tehnic)';const pre=document.createElement('pre');const safe=JSON.parse(JSON.stringify(record,(key,value)=>typeof value==='string'&&/^data:image\//.test(value)?'[imagine Base64 — ascunsă din vizualizarea tehnică]':value));pre.textContent=JSON.stringify(safe,null,2);more.append(summary,pre);container.append(more);}
+function searchable(r){const data=reportData(r);return [r.report_number,r.created_at,r.updated_at,technicianName(r.technician_id),JSON.stringify(data,(key,value)=>typeof value==='string'&&value.startsWith('data:image/')?'':value)].join(' ').toLocaleLowerCase('ro-RO');}
+function renderReports(){const selected=$('technician-filter').value;const q=$('report-search').value.trim().toLocaleLowerCase('ro-RO');const filtered=reports.filter(r=>(selected==='all'||r.technician_id===selected)&&(!q||searchable(r).includes(q)));const list=$('reports-list');list.replaceChildren();reportsStatus(filtered.length+' rapoarte afișate din '+reports.length+' încărcate (maxim 100).');if(!filtered.length){const p=document.createElement('p');p.className='empty';p.textContent='Nu există rapoarte pentru selecția curentă.';list.append(p);return;}for(const record of filtered){const card=document.createElement('article');card.className='report-card';const title=document.createElement('strong');title.textContent=text(record.report_number);const sub=document.createElement('p');sub.className='muted small';sub.textContent=technicianName(record.technician_id)+' · '+formatDate(record.updated_at||record.created_at);const btn=document.createElement('button');btn.type='button';btn.className='secondary';btn.textContent='Vizualizează raportul';btn.setAttribute('aria-expanded','false');const details=document.createElement('div');details.className='report-details hidden';btn.onclick=()=>{const opening=details.classList.contains('hidden');details.classList.toggle('hidden',!opening);btn.textContent=opening?'Ascunde raportul':'Vizualizează raportul';btn.setAttribute('aria-expanded',String(opening));if(opening)displayReport(record,details);};card.append(title,sub,btn,details);list.append(card);}}
+function updateTechnicianFilter(){const select=$('technician-filter'),previous=select.value;select.replaceChildren();const all=document.createElement('option');all.value='all';all.textContent='Toți tehnicienii';select.append(all);const map=new Map();for(const t of technicians)map.set(t.id,t.full_name+(t.active?'':' (dezactivat)'));for(const r of reports)if(r.technician_id&&!map.has(r.technician_id))map.set(r.technician_id,'Tehnician '+r.technician_id.slice(0,8));for(const [id,name] of [...map].sort((x,y)=>x[1].localeCompare(y[1],'ro'))){const opt=document.createElement('option');opt.value=id;opt.textContent=name;select.append(opt);}select.value=[...select.options].some(o=>o.value===previous)?previous:'all';}
+async function loadReports(){const button=$('reports-refresh');button.disabled=true;reportsStatus('Se încarcă rapoartele…');try{const {data,error}=await a.client.from('dominus_v20_constatari').select('*').order('updated_at',{ascending:false}).limit(100);if(error)throw error;reports=Array.isArray(data)?data:[];updateTechnicianFilter();renderReports();}catch(e){reportsStatus('Nu am putut încărca rapoartele: '+(e.message||String(e)),true);}finally{button.disabled=false;}}
+async function load(){try{const result=await invoke({action:'list'});technicians=Array.isArray(result.technicians)?result.technicians:[];const list=$('list');list.replaceChildren();if(!technicians.length){list.textContent='Niciun tehnician.';}for(const t of technicians){const wrap=document.createElement('div');wrap.className='entry';const title=document.createElement('strong');title.textContent=t.full_name+' · '+(t.active?'Activ':'Dezactivat');wrap.append(title);const info=document.createElement('p');info.textContent=(t.email||'')+' · '+(t.phone||'');wrap.append(info);const actions=document.createElement('div');actions.className='actions';for(const [label,fn] of [['Editează',async()=>{const full_name=prompt('Nume complet',t.full_name);if(full_name===null)return;const email=prompt('E-mail',t.email||'');if(email===null)return;const phone=prompt('Telefon',t.phone||'');if(phone===null)return;await invoke({action:'update',id:t.id,full_name,email,phone});}],[(t.active?'Dezactivează':'Reactivează'),async()=>{if(!confirm('Confirmi modificarea stării contului?'))return;await invoke({action:'set_active',id:t.id,active:!t.active});}],['Resetare parolă',async()=>{if(!confirm('Trimitem e-mail de resetare?'))return;await invoke({action:'reset_password',id:t.id});}]]){const b=document.createElement('button');b.type='button';b.textContent=label;b.className='secondary';b.onclick=async()=>{b.disabled=true;try{await fn();status('Operațiune efectuată.');await load();}catch(e){status(e.message,true);}finally{b.disabled=false;}};actions.append(b);}wrap.append(actions);list.append(wrap);}updateTechnicianFilter();renderReports();}catch(e){status(e.message,true);}}
+$('technician-filter').addEventListener('change',renderReports);$('report-search').addEventListener('input',renderReports);$('reports-refresh').onclick=loadReports;$('refresh').onclick=load;
+$('invite').onsubmit=async e=>{e.preventDefault();const b=e.submitter||$('invite').querySelector('button[type=submit]');b.disabled=true;try{await invoke({action:'create',full_name:$('name').value.trim(),email:$('email').value.trim(),phone:$('phone').value.trim()||null});status('Invitația a fost solicitată. Verifică livrarea e-mailului.');$('invite').reset();await load();}catch(err){status(err.message,true);}finally{b.disabled=false;}};
+(async()=>{try{if(!a.configured){location.replace('./login.html');return;}profile=await a.profile();if(!profile||profile.role!=='admin'){location.replace('./login.html');return;}$('who').textContent='Autentificat: '+profile.full_name;$('admin-content').classList.remove('hidden');await Promise.all([load(),loadReports()]);}catch(e){$('who').textContent='Eroare de autentificare: '+(e.message||String(e));}})();
+</script></body></html>
