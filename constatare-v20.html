@@ -468,6 +468,24 @@ async function performCloudSave(){
       if(result.error)throw result.error;
       if(result.data?.length!==1)throw Error('Raportul a fost modificat între timp sau nu mai este accesibil. Reîncarcă-l înainte de salvare.');
     }else{
+      if(list.value){
+        throw Error('Ai selectat un raport existent, dar nu este încă deschis. Apasă „Deschide raportul selectat” înainte de salvare.');
+      }
+      // Protecție suplimentară: nu transforma pierderea legăturii cu un raport
+      // existent într-un INSERT nou cu același număr.
+      // Pentru rapoarte fără număr, utilizatorul trebuie să pornească explicit
+      // din „Raport cloud nou” (vezi verificarea de mai jos).
+      if(reportNumber){
+        const existing=await db.from('dominus_v20_constatari')
+          .select('id')
+          .eq('technician_id',user.id)
+          .eq('report_number',reportNumber)
+          .limit(1);
+        if(existing.error)throw existing.error;
+        if(existing.data?.length){
+          throw Error('Există deja o constatare cu numărul '+reportNumber+'. Deschide raportul existent din listă înainte de salvare. Nu a fost creat niciun duplicat.');
+        }
+      }
       result=await db.from('dominus_v20_constatari')
         .insert({technician_id:user.id,report_number:reportNumber,report_data:reportData,status:'draft'})
         .select('id,updated_at');
