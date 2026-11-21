@@ -1,1 +1,67 @@
-<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;background:#eff4f9;color:#17324a;font:16px system-ui,sans-serif}main{max-width:850px;margin:7vh auto;padding:22px}.panel{background:white;border:1px solid #d8e2ed;border-radius:18px;padding:24px;box-shadow:0 10px 30px #18334d12}h1{margin-top:0}label{display:block;font-weight:600;margin-top:15px}input{box-sizing:border-box;width:100%;padding:13px;border:1px solid #b9c9d7;border-radius:9px;font:inherit}button,.link{display:inline-block;background:#174f79;color:white;border:0;border-radius:9px;padding:12px 17px;margin:12px 7px 0 0;font:inherit;cursor:pointer;text-decoration:none}button:disabled{opacity:.5}.secondary{background:#dce9f4;color:#17324a}.muted{color:#53687b}.error{color:#a52626;white-space:pre-wrap}.ok{color:#17613a}.entry{border-top:1px solid #d8e2ed;padding:16px 0}.actions{display:flex;flex-wrap:wrap;gap:5px}.actions button{font-size:13px;margin:5px 0}#message{min-height:25px}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="./dominus-config.js"></script><script src="./dominus-auth.js"></script><title>DOMINUS V20 – Tehnician</title></head><body><main><div class="panel"><h1>DOMINUS V20 · TEHNICIAN</h1><p id="who">Verificare cont…</p><p class="muted">Autentificarea funcționează. Registrele V19 sunt momentan blocate pentru conturile tehnicienilor până la migrarea și izolarea datelor în Supabase. Nu se șterge nicio înregistrare locală.</p><button onclick="DominusAuth.signOut()">Deconectare</button></div></main><script>(async()=>{const p=await DominusAuth.profile();if(!p||p.role!=='technician'){location.replace('./login.html');return;}document.getElementById('who').textContent='Bun venit, '+p.full_name;})();</script></body></html>
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DOMINUS V20 – Tehnician</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#eff4f9;color:#17324a;font:16px system-ui,sans-serif}
+    main{max-width:900px;margin:7vh auto;padding:22px}
+    .panel{background:#fff;border:1px solid #d8e2ed;border-radius:18px;padding:28px;box-shadow:0 10px 30px #18334d12}
+    h1{margin:0 0 18px;font-size:clamp(25px,4vw,34px)}
+    h2{font-size:21px;margin:0 0 10px}
+    .muted{color:#53687b;line-height:1.6}
+    .card{border:1px solid #d8e2ed;border-radius:14px;padding:22px;margin:24px 0;background:#f9fbfe}
+    .link,button{display:inline-block;background:#174f79;color:#fff;border:0;border-radius:9px;padding:13px 19px;margin:10px 8px 0 0;font:inherit;cursor:pointer;text-decoration:none}
+    .link:hover,button:hover{background:#103c5d}
+    .secondary{background:#dce9f4;color:#17324a}
+    .secondary:hover{background:#cbddec}
+    .hidden{display:none}
+    .error{color:#a52626}
+    @media(max-width:600px){main{margin:20px auto;padding:12px}.panel{padding:20px}.link,button{width:100%;text-align:center}}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="./dominus-config.js"></script>
+  <script src="./dominus-auth.js"></script>
+</head>
+<body>
+  <main>
+    <div class="panel">
+      <h1>DOMINUS V20 · TEHNICIAN</h1>
+      <p id="who" aria-live="polite">Verificare cont…</p>
+      <div id="workspace" class="hidden">
+        <div class="card">
+          <h2>📋 Registru CONSTATARE</h2>
+          <p class="muted">Creează constatări noi, salvează-le online și consultă sau modifică rapoartele tale anterioare.</p>
+          <a class="link" href="./constatare-v20.html">Deschide CONSTATARE V20</a>
+        </div>
+        <p class="muted">Registrele originale V19 rămân separate și nemodificate. Accesul la rapoarte este controlat prin Supabase.</p>
+        <button class="secondary" type="button" id="logout">Deconectare</button>
+      </div>
+    </div>
+  </main>
+  <script>
+    (async function(){
+      try {
+        if (!window.DominusAuth || !DominusAuth.configured) {
+          throw new Error('Conexiunea de autentificare nu este configurată.');
+        }
+        const p = await DominusAuth.profile();
+        if (!p || p.role !== 'technician') {
+          location.replace('./login.html');
+          return;
+        }
+        document.getElementById('who').textContent = 'Bun venit, ' + (p.full_name || 'Tehnician');
+        document.getElementById('workspace').classList.remove('hidden');
+        document.getElementById('logout').addEventListener('click', function(){DominusAuth.signOut();});
+      } catch (err) {
+        const who = document.getElementById('who');
+        who.classList.add('error');
+        who.textContent = 'Nu am putut verifica autentificarea. Reîncarcă pagina sau încearcă din nou.';
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>
