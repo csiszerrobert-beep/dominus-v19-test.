@@ -50,7 +50,7 @@ body{padding-bottom:80px!important}@media print{body{padding-bottom:0!important}
  body{padding-bottom:calc(125px + env(safe-area-inset-bottom))!important}
 }
 @media print{.dominus-v17-bar,.dominus-v17-dialog,.dominus-v16-bar,.dominus-back-bottom,.dominus-bottom-actions,.dominus-bottom-nav{display:none!important}body{padding-bottom:0!important}}
-</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="./dominus-config.js"></script><script src="./dominus-auth.js"></script><style id="dominus-v20-guard">html{visibility:hidden}</style><script>(async()=>{try{const p=await window.DominusAuth.profile();if(!p||!['admin','technician'].includes(p.role)){location.replace('./login.html');return;}document.getElementById('dominus-v20-guard')?.remove();}catch(e){location.replace('./login.html');}})();</script></head><body><header><div class="dominus-top-navigation"><a href="index.html">← Înapoi la formulare</a></div><div class="dominus-logo"><img src="./logo-dominus.png" alt="Dominus"></div><main style="padding:0"><h1>Raport de intervenție/constatare</h1></main></header><main><h1 class="print-title">Raport de intervenție/constatare</h1><p class="muted" id="status">Ciornă salvată local pe acest dispozitiv.</p><section id="v20-cloud-panel" class="no-print" style="border:2px solid #287fae">
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="./dominus-config.js"></script><script src="./dominus-auth.js"></script><style id="dominus-v20-guard">html{visibility:hidden}</style><script>(async()=>{try{const p=await window.DominusAuth.profile();if(!p||!['admin','technician'].includes(p.role)){location.replace('./login.html');return;}document.getElementById('dominus-v20-guard')?.remove();}catch(e){location.replace('./login.html');}})();</script></head><body><header><div class="dominus-top-navigation"><a href="index.html">← Înapoi la formulare</a></div><div class="dominus-logo"><img src="./logo-dominus.png" alt="Dominus"></div><main style="padding:0"><h1>Raport de intervenție/constatare</h1></main></header><main><h1 class="print-title">Raport de intervenție/constatare</h1><p class="muted" id="status">Ciornă salvată local pe acest dispozitiv.</p><div id="v20-admin-back" class="no-print" style="display:none;margin:12px 0"><a class="btn" href="./admin.html">← Înapoi la ADMIN</a></div><section id="v20-cloud-panel" class="no-print" style="border:2px solid #287fae">
 <h2>DOMINUS V20 TEST · Registru cloud</h2>
 <p class="muted">Ciorna locală V20 este separată de V19. Salvarea online se face automat când apeși Salvare, PDF, E-mail sau WhatsApp. Fotografiile se includ în PDF, dar nu sunt încă stocate în cloud. Semnăturile sunt incluse în datele raportului.</p>
 <p id="v20-cloud-status" role="status">Se verifică sesiunea...</p>
@@ -387,6 +387,12 @@ const db=auth?.client;
 let currentId=null, currentUpdatedAt=null, user=null, profile=null;
 const draftKey='dominus_v20_constatare_draft';
 const bindingPrefix='dominus_v20_constatare_cloud_binding_';
+ const urlParams=new URLSearchParams(location.search);
+ const requestedReportId=urlParams.get('report_id');
+ const isAdminLink=urlParams.get('from')==='admin' && !!requestedReportId;
+ const validRequestedId=!!requestedReportId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestedReportId);
+ let directLoadPending=!!requestedReportId;
+
 function bindingKey(){return bindingPrefix+(user?.id||'unknown');}
 function rememberBinding(){
   if(!user)return;
@@ -430,7 +436,7 @@ async function ensureAuth(){
   if(error||!u)throw Error('Sesiune expirată. Autentifică-te din nou.');
   const p=await auth.profile();
   if(!p||!['admin','technician'].includes(p.role))throw Error('Contul nu are acces la registru.');
-  if(!user || user.id!==u.id){user=u;profile=p;restoreBinding();}else{user=u;profile=p;}
+  if(!user || user.id!==u.id){user=u;profile=p;if(!directLoadPending)restoreBinding();}else{user=u;profile=p;}
 }
 async function refresh(){
   await ensureAuth();
@@ -506,7 +512,7 @@ async function performCloudSave(){
 async function openCloud(){
   const id=list.value;
   if(!id){message('Selectează un raport din listă.');return;}
-  if(!confirm('Deschizi raportul selectat? Ciorna V20 afișată acum va fi înlocuită.'))return;
+  if(!skipConfirm&&!confirm('Deschizi raportul selectat? Ciorna V20 afișată acum va fi înlocuită.'))return;
   busy(true);
   try{
     await ensureAuth();
@@ -516,13 +522,14 @@ async function openCloud(){
     rememberBinding();
     applyData(data.report_data);
     message('Raport încărcat din Supabase. Fotografiile trebuie reatașate pentru PDF.');
-  }catch(e){message('Deschidere eșuată: '+e.message);}
+  }catch(e){message('Deschidere eșuată: '+e.message+' Nu modifica și nu salva acest formular.');if(skipConfirm)alert('Raportul nu a putut fi deschis: '+e.message);}
   finally{busy(false);}
 }
 
-btnOpen.addEventListener('click',openCloud);
+btnOpen.addEventListener('click',()=>openCloud());
 btnRefresh.addEventListener('click',async()=>{busy(true);try{await refresh();}catch(e){message('Eroare: '+e.message);}finally{busy(false);}});
 btnNew.addEventListener('click',()=>{
+   if(directLoadPending){alert('Raportul solicitat nu a fost încă încărcat. Revino în ADMIN și deschide din nou raportul.');return;}
   if(!confirm('Începi un raport nou? Ciorna locală V20 curentă va fi înlocuită.'))return;
   clearBinding();
   form.reset();
@@ -557,6 +564,17 @@ window.dominusV17Print=()=>runAfterCloud(()=>window.print());
 window.dominusV17Email=()=>runAfterCloud(()=>email());
 window.dominusWhatsApp=()=>runAfterCloud(()=>originalWhatsApp());
 // Prevenim folosirea unui ID vechi când utilizatorul schimbă raportul din listă.
-refresh().catch(e=>message('Conectare cloud indisponibilă: '+e.message));
+if(requestedReportId){
+   if(!validRequestedId){message('Link invalid: ID-ul raportului nu este valid.');}
+   else (async()=>{
+     try{
+       await ensureAuth();
+       if(isAdminLink && profile.role!=='admin')throw Error('Acest link este rezervat administratorului.');
+       if(isAdminLink)document.getElementById('v20-admin-back').style.display='block';
+       await refresh();
+       await openCloud(requestedReportId,true);
+     }catch(e){message('Nu am putut deschide raportul: '+e.message);}
+   })();
+ }else refresh().catch(e=>message('Conectare cloud indisponibilă: '+e.message));
 })();
 </script></body></html>
