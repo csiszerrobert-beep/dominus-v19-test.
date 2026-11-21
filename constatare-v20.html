@@ -462,6 +462,7 @@ async function performCloudSave(){
   busy(true);
   try{
     await ensureAuth();
+    if(directLoadPending)throw Error('Raportul din linkul ADMIN nu a fost încă încărcat. Revino în ADMIN și deschide-l din nou.');
     const reportData=getData();
     const reportNumber=String(reportData.constatare_Da_0||'').trim()||null;
     let result;
@@ -509,8 +510,8 @@ async function performCloudSave(){
   }catch(e){message('Raportul NU a fost salvat online: '+e.message);alert('Raportul NU a fost salvat online. Ciorna locală rămâne disponibilă.\n'+e.message);return false;}
   finally{busy(false);}
 }
-async function openCloud(){
-  const id=list.value;
+async function openCloud(reportId=null,skipConfirm=false){
+  const id=reportId||list.value;
   if(!id){message('Selectează un raport din listă.');return;}
   if(!skipConfirm&&!confirm('Deschizi raportul selectat? Ciorna V20 afișată acum va fi înlocuită.'))return;
   busy(true);
@@ -519,7 +520,9 @@ async function openCloud(){
     const {data,error}=await db.from('dominus_v20_constatari').select('id,report_data,updated_at').eq('id',id).single();
     if(error)throw error;
     currentId=data.id;currentUpdatedAt=data.updated_at;
+    directLoadPending=false;
     rememberBinding();
+    list.value=data.id;
     applyData(data.report_data);
     message('Raport încărcat din Supabase. Fotografiile trebuie reatașate pentru PDF.');
   }catch(e){message('Deschidere eșuată: '+e.message+' Nu modifica și nu salva acest formular.');if(skipConfirm)alert('Raportul nu a putut fi deschis: '+e.message);}
