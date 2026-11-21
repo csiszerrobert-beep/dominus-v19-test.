@@ -385,6 +385,25 @@ const btnNew=document.getElementById('v20-cloud-new');
 const auth=window.DominusAuth;
 const db=auth?.client;
 let currentId=null, currentUpdatedAt=null, user=null, profile=null;
+const draftKey='dominus_v20_constatare_draft';
+const bindingPrefix='dominus_v20_constatare_cloud_binding_';
+function bindingKey(){return bindingPrefix+(user?.id||'unknown');}
+function rememberBinding(){
+  if(!user)return;
+  if(currentId && currentUpdatedAt)localStorage.setItem(bindingKey(),JSON.stringify({id:currentId,updatedAt:currentUpdatedAt}));
+  else localStorage.removeItem(bindingKey());
+}
+function restoreBinding(){
+  if(!user)return;
+  try{
+    const b=JSON.parse(localStorage.getItem(bindingKey())||'null');
+    if(b && typeof b.id==='string' && typeof b.updatedAt==='string'){
+      currentId=b.id;currentUpdatedAt=b.updatedAt;
+    }
+  }catch(e){console.warn('Legătura raportului nu poate fi citită:',e);}
+}
+function clearBinding(){currentId=null;currentUpdatedAt=null;rememberBinding();}
+
 function message(t){cloudStatus.textContent=t;}
 function busy(on){btnOpen.disabled=btnRefresh.disabled=btnNew.disabled=on;}
 function getData(){return capture();}
@@ -411,7 +430,7 @@ async function ensureAuth(){
   if(error||!u)throw Error('Sesiune expirată. Autentifică-te din nou.');
   const p=await auth.profile();
   if(!p||!['admin','technician'].includes(p.role))throw Error('Contul nu are acces la registru.');
-  user=u;profile=p;
+  if(!user || user.id!==u.id){user=u;profile=p;restoreBinding();}else{user=u;profile=p;}
 }
 async function refresh(){
   await ensureAuth();
@@ -424,7 +443,7 @@ async function refresh(){
     opt.textContent=(item.report_number||'Fără număr')+' · '+new Date(item.created_at).toLocaleDateString('ro-RO')+(item.technician_id===user.id?' · al meu':' · alt tehnician');
     list.appendChild(opt);
   }
-  list.value=currentId||'';
+  list.value=[...list.options].some(o=>o.value===currentId)?currentId:'';
   message('Conectat: '+(profile.full_name||profile.email||profile.role)+' · '+(data||[]).length+' rapoarte afișate (maxim 100).');
 }
 let savingPromise=null;
@@ -457,6 +476,7 @@ async function performCloudSave(){
     }
     currentId=result.data[0].id;
     currentUpdatedAt=result.data[0].updated_at;
+    rememberBinding();
     save();
     message('Salvat online · '+new Date().toLocaleTimeString('ro-RO')+' · ID: '+currentId);
     try{await refresh();}catch(refreshError){console.warn('Lista nu s-a actualizat:',refreshError);}
@@ -475,6 +495,7 @@ async function openCloud(){
     const {data,error}=await db.from('dominus_v20_constatari').select('id,report_data,updated_at').eq('id',id).single();
     if(error)throw error;
     currentId=data.id;currentUpdatedAt=data.updated_at;
+    rememberBinding();
     applyData(data.report_data);
     message('Raport încărcat din Supabase. Fotografiile trebuie reatașate pentru PDF.');
   }catch(e){message('Deschidere eșuată: '+e.message);}
@@ -485,16 +506,20 @@ btnOpen.addEventListener('click',openCloud);
 btnRefresh.addEventListener('click',async()=>{busy(true);try{await refresh();}catch(e){message('Eroare: '+e.message);}finally{busy(false);}});
 btnNew.addEventListener('click',()=>{
   if(!confirm('Începi un raport nou? Ciorna locală V20 curentă va fi înlocuită.'))return;
-  currentId=null;currentUpdatedAt=null;
+  clearBinding();
   form.reset();
   for(const id of ['sig1','sig2']){const c=document.getElementById(id);c.getContext('2d').clearRect(0,0,c.width,c.height);}
-  localStorage.removeItem('dominus_v20_constatare_draft');
+  localStorage.removeItem(draftKey);
   window.dominusClientNewDocument?.();
   list.value='';message('Raport nou. Completează formularul și apasă „Salvare”.');
 });
 // Existing V19 reset button should never reuse the cloud record ID.
 const oldReset=window.resetReport;
-window.resetReport=function(){const before=localStorage.getItem('dominus_v20_constatare_draft');oldReset();if(before!==null && localStorage.getItem('dominus_v20_constatare_draft')===null){currentId=null;currentUpdatedAt=null;list.value='';}};
+window.resetReport=function(){
+  const before=localStorage.getItem(draftKey);
+  oldReset();
+  if(before!==null && localStorage.getItem(draftKey)===null){clearBinding();list.value='';}
+};
 // Toate acțiunile utilizatorului salvează online înainte de continuare.
 const originalWhatsApp=window.dominusWhatsApp;
 let actionInProgress=false;
